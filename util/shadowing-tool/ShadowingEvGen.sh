@@ -27,11 +27,11 @@ export LBRUNID=$7
 ##################################
 # SEND INFORMATION TO RATDB FILE
 
-date >> SHADOWING_LASERBALL_RUNS.txt
+date >> SHADOWING_RUNS.txt
 export STRING="Run ID ${LBRUNID} - (x,y,z):(${XPOS},${YPOS},${ZPOS}) with ${LAMBDA} nm laser for $(($NJOBS*$NEVENTS)) events"
-echo ${STRING} >> SHADOWING_LASERBALL_RUNS.txt
+echo ${STRING} >> SHADOWING_RUNS.txt
 export STRINGSPACE=" "
-echo ${STRINGSPACE} >> SHADOWING_LASERBALL_RUNS.txt
+echo ${STRINGSPACE} >> SHADOWING_RUNS.txt
 
 ##################################
 ##################################

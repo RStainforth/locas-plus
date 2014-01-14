@@ -32,7 +32,7 @@
 /rat/procset update 1000
 /rat/proc calibratePMT
 /rat/proc outroot
-/rat/procset file "${ROOTFileName}"
+/rat/procset file "%{ROOTFileName}"
 # END EVENT LOOP
 
 # Switch off attenuation (and scattering for the run)
@@ -40,14 +40,14 @@
 
 # Choose the photonbomb generator from fixed point, uniformly random in time
 /generator/add combo pbomb:point:uniform
-# Choose 4000 photons, each of ${Lambda} nm per pulse
-/generator/vtx/set 4000 ${Lambda} 0
+# Choose 4000 photons, each of %{Lambda} nm per pulse
+/generator/vtx/set 4000 %{Lambda} 0
 
 # Position the photonbomb at (X,Y,Z)
-/generator/pos/set ${XPos} ${YPos} ${ZPos}
+/generator/pos/set %{XPos} %{YPos} %{ZPos}
 /generator/rate/set 50
 
-# Run ${EventsPerCycle} events
-/rat/run/start ${EventsPerCycle}
+# Run %{EventsPerCycle} events
+/rat/run/start %{EventsPerCycle}
 
 exit

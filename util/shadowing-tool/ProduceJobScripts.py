@@ -11,7 +11,7 @@ class PercentTemplate(string.Template):
 def ProduceRATMacro( macro_name, xVal, yVal, zVal, waveL, cycle_val, events_per_cycle, job_ID ):
     
     in_file = open( macro_name + ".mac", "r" )
-    raw_text = string.Template( in_file.read() )
+    raw_text = PercentTemplate( in_file.read() )
     in_file.close()
 
     root_file_name = str(job_ID) + "_" + macro_name + "_" + str(cycle_val) + ".root"
@@ -84,7 +84,7 @@ def ProduceROOTWHMMacro( config_name, number_of_jobs, job_ID ):
 def ProduceROOTWHMBash( config_name, job_ID, ratroot, locasroot, locasdatatmp ):
 
     in_file = open( "ROOTBashWHM.sh", "r" )
-    raw_text = string.Template( in_file.read() )
+    raw_text = PercentTemplate( in_file.read() )
     in_file.close()
 
     out_text = raw_text.substitute( ConfigName = config_name,
@@ -120,7 +120,7 @@ def ProduceROOTRHMMacro( config_name, job_ID ):
 def ProduceROOTRHMBash( config_name, job_ID, ratroot, locasroot, locasdatatmp ):
 
     in_file = open( "ROOTBashRHM.sh", "r" )
-    raw_text = string.Template( in_file.read() )
+    raw_text = PercentTemplate( in_file.read() )
     in_file.close()
 
     out_text = raw_text.substitute( ConfigNameCore = config_name,
