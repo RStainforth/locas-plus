@@ -371,6 +371,7 @@ done
 cd ${USERDIR}
 
 cp -ar ${LBRUNID} ${FINALDIR}
+sleep 30
 cp ${FINALDIR}/${LBRUNID}/AVHD/*.ratdb ${LOCAS_DATA}/shadowing/avhd
 cp ${FINALDIR}/${LBRUNID}/GEO/*.ratdb ${LOCAS_DATA}/shadowing/geo
 
