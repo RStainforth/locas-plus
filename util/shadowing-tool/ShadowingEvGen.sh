@@ -108,7 +108,7 @@ mv ${LBRUNID}_woGEO_*.* woGEO
 # Submit ${NJOBS}
 for ((i=0;i<${NJOBS};i++))
   do
-    qsub -q medium64 -o ${USERDIR}/${LBRUNID}/wAVHD -e ${USERDIR}/${LBRUNID}/wAVHD/${LBRUNID}_wAVHD_${i}.txt wAVHD/${LBRUNID}_wAVHD_${i}.sh	
+    qsub -q snoplusSL6 -o ${USERDIR}/${LBRUNID}/wAVHD -e ${USERDIR}/${LBRUNID}/wAVHD/${LBRUNID}_wAVHD_${i}.txt wAVHD/${LBRUNID}_wAVHD_${i}.sh	
 done
 
 # Check the jobs finished before proceeding
@@ -145,7 +145,7 @@ mv WHM_${LBRUNID}_wAVHD.* root_files
 cd root_files
 
 # Submit the job to merge and process all the root files
-qsub -q medium64 -o ${USERDIR}/${LBRUNID}/wAVHD/root_files -e ${USERDIR}/${LBRUNID}/wAVHD/root_files/WHM_${LBRUNID}_wAVHD.txt WHM_${LBRUNID}_wAVHD.sh
+qsub -q snoplusSL6 -o ${USERDIR}/${LBRUNID}/wAVHD/root_files -e ${USERDIR}/${LBRUNID}/wAVHD/root_files/WHM_${LBRUNID}_wAVHD.txt WHM_${LBRUNID}_wAVHD.sh
 
 # Check whether the job finished
 qstat | grep ${USERNAME}
@@ -175,7 +175,7 @@ cd ${USERDIR}/${LBRUNID}
 
 for ((i=0;i<${NJOBS};i++))
   do
-    qsub -q medium64 -o ${USERDIR}/${LBRUNID}/woAVHD -e ${USERDIR}/${LBRUNID}/woAVHD/${LBRUNID}_woAVHD_${i}.txt woAVHD/${LBRUNID}_woAVHD_${i}.sh	
+    qsub -q snoplusSL6 -o ${USERDIR}/${LBRUNID}/woAVHD -e ${USERDIR}/${LBRUNID}/woAVHD/${LBRUNID}_woAVHD_${i}.txt woAVHD/${LBRUNID}_woAVHD_${i}.sh	
 done
 
 # Check whether the job finished
@@ -204,7 +204,7 @@ mv ${LBRUNID}_woAVHD_*.root root_files
 mv WHM_${LBRUNID}_woAVHD.* root_files
 cd root_files
 
-qsub -q medium64 -o ${USERDIR}/${LBRUNID}/woAVHD/root_files -e ${USERDIR}/${LBRUNID}/woAVHD/root_files/WHM_${LBRUNID}_woAVHD.txt WHM_${LBRUNID}_woAVHD.sh
+qsub -q snoplusSL6 -o ${USERDIR}/${LBRUNID}/woAVHD/root_files -e ${USERDIR}/${LBRUNID}/woAVHD/root_files/WHM_${LBRUNID}_woAVHD.txt WHM_${LBRUNID}_woAVHD.sh
 
 # Check whether the job finished
 qstat | grep ${USERNAME}
@@ -230,7 +230,7 @@ cd ${USERDIR}/${LBRUNID}
 
 for ((i=0;i<${NJOBS};i++))
   do
-    qsub -q medium64 -o ${USERDIR}/${LBRUNID}/wGEO -e ${USERDIR}/${LBRUNID}/wGEO/${LBRUNID}_wGEO_${i}.txt wGEO/${LBRUNID}_wGEO_${i}.sh	
+    qsub -q snoplusSL6 -o ${USERDIR}/${LBRUNID}/wGEO -e ${USERDIR}/${LBRUNID}/wGEO/${LBRUNID}_wGEO_${i}.txt wGEO/${LBRUNID}_wGEO_${i}.sh	
 done
 
 # Check whether the job finished
@@ -259,7 +259,7 @@ mv ${LBRUNID}_wGEO_*.root root_files
 mv WHM_${LBRUNID}_wGEO.* root_files
 cd root_files
 
-qsub -q medium64 -o ${USERDIR}/${LBRUNID}/wGEO/root_files -e ${USERDIR}/${LBRUNID}/wGEO/root_files/WHM_${LBRUNID}_wGEO.txt WHM_${LBRUNID}_wGEO.sh
+qsub -q snoplusSL6 -o ${USERDIR}/${LBRUNID}/wGEO/root_files -e ${USERDIR}/${LBRUNID}/wGEO/root_files/WHM_${LBRUNID}_wGEO.txt WHM_${LBRUNID}_wGEO.sh
 
 # Check whether the job finished
 qstat | grep ${USERNAME}
@@ -285,7 +285,7 @@ cd ${USERDIR}/${LBRUNID}
 
 for ((i=0;i<${NJOBS};i++))
   do
-    qsub -q medium64 -o ${USERDIR}/${LBRUNID}/woGEO -e ${USERDIR}/${LBRUNID}/woGEO/${LBRUNID}_woGEO_${i}.txt woGEO/${LBRUNID}_woGEO_${i}.sh	
+    qsub -q snoplusSL6 -o ${USERDIR}/${LBRUNID}/woGEO -e ${USERDIR}/${LBRUNID}/woGEO/${LBRUNID}_woGEO_${i}.txt woGEO/${LBRUNID}_woGEO_${i}.sh	
 done
 
 # Check whether the job finished
@@ -314,7 +314,7 @@ mv ${LBRUNID}_woGEO_*.root root_files
 mv WHM_${LBRUNID}_woGEO.* root_files
 cd root_files
 
-qsub -q medium64 -o ${USERDIR}/${LBRUNID}/woGEO/root_files -e ${USERDIR}/${LBRUNID}/woGEO/root_files/WHM_${LBRUNID}_woGEO.txt WHM_${LBRUNID}_woGEO.sh
+qsub -q snoplusSL6 -o ${USERDIR}/${LBRUNID}/woGEO/root_files -e ${USERDIR}/${LBRUNID}/woGEO/root_files/WHM_${LBRUNID}_woGEO.txt WHM_${LBRUNID}_woGEO.sh
 
 # Check whether the job finished
 qstat | grep ${USERNAME}
@@ -353,8 +353,8 @@ cp ${USERDIR}/${LBRUNID}/wGEO/root_files/WHM/${LBRUNID}_wGEO_TMP.root GEO
 cp ${USERDIR}/${LBRUNID}/woGEO/root_files/WHM/${LBRUNID}_woGEO_TMP.root GEO
 
 # Process the data
-qsub -m ea -q medium64 -o ${USERDIR}/${LBRUNID}/AVHD -e ${USERDIR}/${LBRUNID}/AVHD/RHM_${LBRUNID}_AVHD.txt AVHD/RHM_${LBRUNID}_AVHD.sh
-qsub -m ea -q medium64 -o ${USERDIR}/${LBRUNID}/GEO -e ${USERDIR}/${LBRUNID}/GEO/RHM_${LBRUNID}_GEO.txt GEO/RHM_${LBRUNID}_GEO.sh
+qsub -m ea -q snoplusSL6 -o ${USERDIR}/${LBRUNID}/AVHD -e ${USERDIR}/${LBRUNID}/AVHD/RHM_${LBRUNID}_AVHD.txt AVHD/RHM_${LBRUNID}_AVHD.sh
+qsub -m ea -q snoplusSL6 -o ${USERDIR}/${LBRUNID}/GEO -e ${USERDIR}/${LBRUNID}/GEO/RHM_${LBRUNID}_GEO.txt GEO/RHM_${LBRUNID}_GEO.sh
 
 # Check whether the job finished
 qstat | grep ${USERNAME}
