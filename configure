@@ -1,4 +1,4 @@
-#!/bin/bash
+#$ -S /bin/bash
 # Configure script for fresh LOCAS code release
 # authored by Robert Stainforth at University of Liverpool
 # rpfs@liv.ac.uk
@@ -56,7 +56,7 @@ LOCASDATA=${LOCASROOT}/data
 # Now create the env_locas.sh and env_locas.csh files
 printf "%-25s" "Generating locas_env.sh..."
 cat > env_locas.sh << EOF
-#!/bin/bash
+#$ -S /bin/bash
 
 export LOCAS_ROOT=$LOCASROOT
 export LOCAS_DATA=$LOCASDATA
