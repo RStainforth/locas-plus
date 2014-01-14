@@ -1,4 +1,4 @@
-#!/bin/bash
+#$ -S /bin/bash
 
 # Temporary top directory to store simulated data
 
