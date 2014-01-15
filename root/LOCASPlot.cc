@@ -17,6 +17,9 @@
 #include "LOCASLightPath.hh"
 #include "LOCASDB.hh"
 
+#include <sstream>
+#include <string>
+
 
 // Function which loads the ROOT file
 void
@@ -809,8 +812,11 @@ TResiduals( const char* root_file, const char* plot_file_name )
 
   Double_t lambdaE = 3.103125 * 0.000001;
 
-  TH1D* timeResiduals = new TH1D( "Time Residuals", "Time Residuals", 600, 200.0, 500.0 );
-  TH1D* timeRaw = new TH1D( "Time Raw", "Time Raw", 600, 200.0, 500.0 );
+  TH1D* timeResiduals = new TH1D( "Time Residuals", "Time Residuals", 301, 199.5, 500.5 );
+  TH1D* timeRaw = new TH1D( "Time Raw", "Time Raw", 301, 199.5, 500.5 );
+
+  timeResiduals->SetBit(TH1::kNoTitle);
+  timeRaw->SetBit(TH1::kNoTitle);
 
   LOCAS::LOCASLightPath lLP;
 
@@ -829,32 +835,32 @@ TResiduals( const char* root_file, const char* plot_file_name )
 
       RAT::DS::EV* rEV = rDS->GetEV( iEV );
       RAT::DS::PMTProperties* rPMTProp = rRun->GetPMTProp();
-
+      
       // Loop over the PMTCals i.e. the PMTs registering a hit
       for( Int_t iPMT = 0; iPMT < rEV->GetPMTCalCount(); iPMT++ ){
-
-	// Get the PMT ID
-	Int_t pmtID = rEV->GetPMTCal( iPMT )->GetID();
-	
-	// Get the PMT Position
-	TVector3 pmtPos = rPMTProp->GetPos( pmtID );
-
-	Double_t hitTime = rEV->GetPMTCal( iPMT )->GetTime();
-
-	timeRaw->Fill( hitTime );
-	
-	lLP.CalculatePath( startPos, pmtPos, 10.0, 400.0 );
-
-	Double_t timeResidual = hitTime - lLP.GetDistInScint() / scGraph->Eval( lambdaE )
-	  - lLP.GetDistInAV() / avGraph->Eval( lambdaE )
-	  - lLP.GetDistInWater() / waterGraph->Eval( lambdaE );
-
-	timeResiduals->Fill( timeResidual );
-
+        
+        // Get the PMT ID
+        Int_t pmtID = rEV->GetPMTCal( iPMT )->GetID();
+        
+        // Get the PMT Position
+        TVector3 pmtPos = rPMTProp->GetPos( pmtID );
+        
+        Double_t hitTime = rEV->GetPMTCal( iPMT )->GetTime();
+        
+        if (startPos.Mag() < 4000.0){
+          timeRaw->Fill( hitTime );	
+          lLP.CalculatePath( startPos, pmtPos, 10.0, 400.0 );
+          
+          Double_t timeResidual = hitTime - lLP.GetDistInScint() / scGraph->Eval( lambdaE )
+            - lLP.GetDistInAV() / avGraph->Eval( lambdaE )
+            - lLP.GetDistInWater() / waterGraph->Eval( lambdaE );
+          
+          timeResiduals->Fill( timeResidual );
+        }
       }
     }
   }
-
+  
   TCanvas* c1 = new TCanvas( "c-TimeResiduals", "Time Residuals", 600, 400 );
   
   timeResiduals->GetXaxis()->SetTitle( "Time [ns]" );
@@ -870,6 +876,8 @@ TResiduals( const char* root_file, const char* plot_file_name )
   timeRaw->Draw( "same" );
   gStyle->SetOptStat(0);
   
+  c1->SetLogy();
+  
   TLegend* myLeg = new TLegend( 0.65, 0.65, 0.85, 0.85 );
   
   myLeg->AddEntry( timeResiduals, "Time Residuals", "l" );
@@ -880,11 +888,92 @@ TResiduals( const char* root_file, const char* plot_file_name )
   c1->Print(plot_file_name);
   
   return c1;
+  
+}
 
+
+TCanvas*
+AVHDRopeShadowing( const Int_t runID, const char* plot_file_name,
+                       const Double_t minROcc, const Double_t maxROcc )
+{
+  
+  TGraph* pmtShadowing = new TGraph();
+  Int_t pmtVal = 0;
+
+  LOCAS::LOCASDB lDB;
+  lDB.LoadPMTPositions();
+  lDB.LoadAVHDRopePMTShadowingVals( runID );
+
+  for ( Int_t iPMT = 0; iPMT < lDB.GetNPMTs(); iPMT++ ){
+
+    Int_t pmtType = lDB.GetPMTType( iPMT );
+    Double_t pmtShadowVal = lDB.GetAVHDRopePMTShadowingVal( iPMT );
+
+    if ( pmtShadowVal > minROcc && pmtShadowVal < maxROcc ){
+      TVector3 pmtPos = lDB.GetPMTPosition( iPMT );
+      pmtShadowing->SetPoint( pmtVal++, pmtPos.Phi(), pmtPos.CosTheta() );
+    } 
+  }
+
+  TCanvas* c1 = new TCanvas( "c-AVHDRopePMTShadowing", "AVHD Rope PMT Shadowing", 600, 400 );
+  
+  pmtShadowing->GetXaxis()->SetTitle( "#phi_{PMT}" );
+  pmtShadowing->GetYaxis()->SetTitle( "Cos(#theta_{PMT})" );
+
+  pmtShadowing->SetMarkerColor( 2 );
+  pmtShadowing->SetMarkerStyle( 6 );
+  pmtShadowing->SetMarkerSize( 1 );
+  
+  pmtShadowing->Draw( "AP" );
+  
+  c1->Print(plot_file_name);
+  
+  return c1;
+  
+}
+
+TCanvas*
+GeoShadowing( const Int_t runID, const char* plot_file_name,
+                  const Double_t minROcc, const Double_t maxROcc )
+{
+  
+  TGraph* pmtShadowing = new TGraph();
+  Int_t pmtVal = 0;
+
+  LOCAS::LOCASDB lDB;
+  lDB.LoadPMTPositions();
+  lDB.LoadGeoPMTShadowingVals( runID );
+
+  for ( Int_t iPMT = 0; iPMT < lDB.GetNPMTs(); iPMT++ ){
+
+    Int_t pmtType = lDB.GetPMTType( iPMT );
+    Double_t pmtShadowVal = lDB.GetGeoPMTShadowingVal( iPMT );
+
+    if ( pmtShadowVal > minROcc && pmtShadowVal < maxROcc ){
+      TVector3 pmtPos = lDB.GetPMTPosition( iPMT );
+      pmtShadowing->SetPoint( pmtVal++, pmtPos.Phi(), pmtPos.CosTheta() );
+    } 
+  }
+
+  TCanvas* c1 = new TCanvas( "c-GeoPMTShadowing", "Geo PMT Shadowing", 600, 400 );
+  
+  pmtShadowing->GetXaxis()->SetTitle( "#phi_{PMT}" );
+  pmtShadowing->GetYaxis()->SetTitle( "Cos(#theta_{PMT})" );
+
+  pmtShadowing->SetMarkerColor( 2 );
+  pmtShadowing->SetMarkerStyle( 6 );
+  pmtShadowing->SetMarkerSize( 1 );
+  
+  pmtShadowing->Draw( "AP" );
+  
+  c1->Print(plot_file_name);
+  
+  return c1;
+  
 }
 
 void
-PlotAll( const char* root_file )
+PlotAll( const char* root_file, const Int_t runID )
 {
 
   TCanvas* plotLOCASDavVDh2o = LOCASDavVDh2o( root_file, "locas_h2o_vs_av.eps", 0.0, 6005.3 );
@@ -898,6 +987,18 @@ PlotAll( const char* root_file )
 
   TCanvas* plotTimeResiduals = TResiduals( root_file, "time_residuals.eps" );
 
+  stringstream theStream;
+  string theString;
+
+  theStream << runID;
+  theStream >> theString;
+
+  string avhdPlotFile = (theString + "_avhd_shadowing.eps");
+  string geoPlotFile = (theString + "_geo_shadowing.eps");
+
+  TCanvas* plotAVHDRopeShadowing = AVHDRopeShadowing( runID, avhdPlotFile.c_str(), 0.0, 0.9 );
+  TCanvas* plotGeoPMTShadowing = GeoShadowing( runID, geoPlotFile.c_str(), 0.0, 0.9 );
+
   TFile* f = new TFile("graphs.root", "RECREATE");
 
   f->WriteTObject(plotLOCASDavVDh2o);
@@ -910,6 +1011,9 @@ PlotAll( const char* root_file )
   f->WriteTObject(plotRIndices);
 
   f->WriteTObject(plotTimeResiduals);
+
+  f->WriteTObject(plotAVHDRopeShadowing);
+  f->WriteTObject(plotGeoPMTShadowing);
   f->Close();
 
 }
