@@ -74,7 +74,7 @@ int main( int argc, char** argv ){
   listOfRunIDs = lDB.GetRunList();
 
   cout << "Following runs will be loaded into fit: " << endl;
-  for ( Int_t tK = 1; tK < 2; tK++ ){
+  for ( Int_t tK = 0; tK < listOfRunIDs.size(); tK++ ){
     lReader->Add( listOfRunIDs[ tK ] );
     LOCASRun* runPtr = lReader->GetLOCASRun( listOfRunIDs[ tK ] );
     cout << "Run ID: " << runPtr->GetRunID() << endl;
@@ -92,11 +92,11 @@ int main( int argc, char** argv ){
   static Double_t vstart[1] = { 0.00001 };
   static Double_t step[1] = { 0.000001 };
   
-  gMinuit->mnparm( 0, "a0", 5000.0, 500.0, 10.0, 200000.0, ierflg );
+  gMinuit->mnparm( 0, "a0", 50000.0, 1000.0, 10.0, 1000000.0, ierflg );
   
   argList[0] = 50000;
   argList[1] = 1.0;
-  gMinuit->mnexcm( "HESSE", argList, 2, ierflg );
+  gMinuit->mnexcm( "MIGRAD", argList, 2, ierflg );
   
   Double_t amin, edm, errdef;
   Int_t nvpar, nparx, icstat;
@@ -146,6 +146,8 @@ void EvaluateGlobalChiSquare( Int_t &nPar, Double_t* gIn, Double_t &f, Double_t*
   //cout << "Params value: " << params[0] << endl;
   Float_t chiSquare = 0.0;
 
+  Int_t nPMTs = 0;
+
   for ( Int_t iRun = 1; iRun < 2; iRun++ ){
     currentRun = lReader->GetLOCASRun( listOfRunIDs[ iRun ] );
 
@@ -153,33 +155,37 @@ void EvaluateGlobalChiSquare( Int_t &nPar, Double_t* gIn, Double_t &f, Double_t*
     for ( iPMT = currentRun->GetLOCASPMTIterBegin(); iPMT != currentRun->GetLOCASPMTIterEnd(); iPMT++ ){
 
       currentPMT = &( iPMT->second );
-      if ( currentPMT->GetCosTheta() >= 0.9998 && currentPMT->GetIsVerified() ){
+      if ( currentPMT->GetCosTheta() >= 0.9990 && currentPMT->GetIsVerified() && currentPMT->GetAVHDShadowVal() > 0.95 && currentPMT->GetGeometricShadowVal() > 0.98 && currentPMT->GetAVHDShadowVal() < 1.02 && currentPMT->GetGeometricShadowVal() < 1.05 ){
+	nPMTs++;
 	Float_t dataROcc = currentPMT->GetOccRatio();
-	Float_t dataFactor =  1.0 / ( (currentPMT->GetCorrSolidAngle())*(currentPMT->GetCorrFresnelTCoeff()));
-	// cout << "######################" << endl;
-	// cout << "[Data]ROcc: " << dataROcc << " | Scaling Factor: " << dataFactor << " | Corrected [Data]Rocc: " << dataROcc * dataFactor << endl;
-	dataROcc *= dataFactor;
+	Float_t dataFactor =  1.0;// ( (currentPMT->GetCorrSolidAngle())*(currentPMT->GetCorrFresnelTCoeff()));
+	//cout << "######################" << endl;
+	//cout << "[Data]ROcc: " << dataROcc << " | Scaling Factor: " << dataFactor << " | Corrected [Data]Rocc: " << dataROcc * dataFactor << endl;
+	dataROcc = dataROcc*dataFactor;
 
-	//cout << dataROcc << endl;
+	cout << dataROcc << endl;
 	histoData->Fill( dataROcc );
 
 	Float_t modelROcc = CalcModelROcc( params );
 
-	//cout << modelROcc << endl;
+	cout << modelROcc << endl;
 	histoModel->Fill( modelROcc );
 
 	graph->SetPoint( point++, dataROcc, modelROcc );
 
 	Float_t roccError = currentPMT->GetOccRatioErr();
 	// cout << "[Data]ROcc error: " << roccError << endl;
-	//cout << "PMT ID: " << currentPMT->GetID() << endl;
+	cout << "PMT ID: " << currentPMT->GetID() << endl;
 	//cout << "Z pos: " << (currentPMT->GetPos()).Z() << endl;
 	if ( roccError > 0.0 ){
 	  Float_t calcVal =  ( ( dataROcc - modelROcc ) * ( dataROcc - modelROcc ) ) / ( ( modelROcc ) );
 	  
 	  chiSquare += calcVal;
-	  //cout << "ChiSquare: " << calcVal << endl;
-	  //cout << "##################" << endl;
+	  cout << "ChiSquare: " << calcVal << endl;
+	  cout << "Total ChiSquare: " << chiSquare << endl;
+	  cout << "Number of PMTs is: " << nPMTs << endl;
+	  cout << "ChiqSquare/nPMTs-1= " << (Double_t)chiSquare/(Double_t)(nPMTs-1.0) << endl;
+	  cout << "##################" << endl;
 	  }
 	}
       }      

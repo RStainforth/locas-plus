@@ -83,7 +83,7 @@ int main( int argc, char** argv ){
   //socTreeFinal->Branch( "soc", socBrPri->ClassName(), &socBrPri, 32000, 99 );
   //socTreeFinal->SetBranchAddress( "soc", &socBrPri );
 
-  cout << "Value of argc is: " << argc << endl;
+  cout << "Number of files to be merged: " << argc-2 << endl;
 
   //socTreeFinal->Branch( "soc", socBrPri.ClassName(), &socBrPri, 32000, 99 );
 
@@ -109,7 +109,7 @@ int main( int argc, char** argv ){
     //TTree* socTreeTmp = (TTree*)socFileTmp->Get( "T" );
 
     DS::SOC* socBrTmp = socReader.GetSOC( iFile );
-    cout << "Filename is: " << argv[ iFile ] << endl;
+    cout << "Adding file: " << argv[ iFile ] << "..." << endl;
     
     //socTreeTmp->SetBranchAddress( "soc", &socBrTmp ); 
     //socTreeTmp->GetEntry( 0 ); 
@@ -141,6 +141,36 @@ int main( int argc, char** argv ){
       Double_t ogPromptOcc = socPMTPri->GetPromptOcc();
       Double_t tmpPromptOcc = socPMTTmp->GetPromptOcc();
       socPMTPri->SetPromptOcc( ogPromptOcc + tmpPromptOcc );
+
+
+      // Add over all the TACs/RMS and average them
+      Double_t ogTAC = 0.0;
+      Double_t ogRMS = 0.0;
+      socPMTPri->CalculateTAC( ogTAC, ogRMS );
+
+      Double_t tmpTAC = 0.0;
+      Double_t tmpRMS = 0.0;
+      socPMTTmp->CalculateTAC( tmpTAC, tmpRMS );
+      ogTAC += tmpTAC;
+      ogRMS += tmpRMS;
+
+      if ( iFile == argc -1 ){
+	socPMTPri->SetTACCalculated( ogTAC/( (Double_t)( argc-2.0 ) ), ogRMS/( (Double_t)(argc-2.0) ) );
+      }
+      else{
+	socPMTPri->SetTACCalculated( ogTAC, ogRMS );
+      }
+
+      // Add over all the TOF and average them
+      Double_t ogTOF = socPMTPri->GetTOF();
+      ogTOF += socPMTTmp->GetTOF();
+      socPMTPri->SetTOF( ogTOF );
+
+      if ( iFile == argc -1 ){
+	socPMTPri->SetTOF( ogTOF/((Double_t)(argc-2.0)) );
+      }
+      
+      
       
     }
     
