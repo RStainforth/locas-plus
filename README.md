@@ -57,7 +57,28 @@ respectively to compile LOCAS and the library shared object file 'libLOCAS.so'.
 
 Usage
 ==========
-LOCAS compiles two executables 'db2soc' and 'soc2locas'.
+LOCAS currently compiles four executables 'soc2soc', 'db2soc', 'soc2locas' and 'locas2fit'.
+
+soc2soc
+==========
+This executable is a utility similar to 'hadd' which comes with ROOT. 'soc2soc' adds the PMT information from many SOC files together to create one single SOC file. For example, using a local batch system, you may have simulated 5 x 2000 event SOC files for the laserball at the centre of the detector. It would be convenient to put all these SOC files together into a single 10,000 event SOC file for use in LOCAS or some other analysis. To do this, the example usage at the command line would be:
+
+    soc2soc final_soc.root soc_1.root soc_2.root soc_3.root soc_4.root soc_5.root
+
+where 'final_soc.root' is the name of the single SOC file you would like to create from the five individual SOC files entitled soc_1.root, soc_2.root, ..., soc_5.root.
+
+On each SOC file, each of the single SOCPMT objects and their respective fields are summed over as follows:
+
+   TACs: Every TAC from the same channel across all files are added together
+   QHSs and QHLs: Every QHS and QHL from the same channel across all files are added together
+   Prompt Counts: Every prompt count on the same channel across all files are added together
+   Calculated TAC and RMS: These are summed over all files for the same channel and averaged
+   Time of Flight (TOF): These are all summed and averaged 
+
+'soc2soc' was created because 'hadd' includes each PMT from a SOC file as an individual entry. For example, in the above scenario, instead of approximately 9,000 PMT entries on the SOC file (representing the 9000 individual PMTs), there would actually be 5 x 9,000 entries. This was the main problem with 'hadd' and the motivation for writing this executable.
+
+Note: The final SOC file will have a dummy RAT::DS::Run object written to a TTree, but it will be empty. This is to avoid conflict with the pre-existing SOC file format for .root files.
+
 
 db2soc 
 ==========
@@ -65,19 +86,19 @@ This executable is designed for inserting information held in the RAT or LOCAS d
 
 Example use at the command line: 
 
-    db2soc -r 123456
+    db2soc -r 123456 -f 123456
 
-The argument passed to the '-r' option is the run ID. LOCAS then searches for the corresponding SOC file '123456_Run.root' in the 'locas-plus/data/runs/soc' directory. If found, it will then search for the corresponding shadowing values stored in the LOCAS data directory (data/shadowing). For the shadowing values due to the AV Hold-Down ropes LOCAS will search the 'locas-plus/data/shadowing/avhd' directory for a file of the form 'avhd_123456.ratdb'. The shadowing values for the other enveloping geometry which surrounds the AV will be searched for in the 'locas-plus/data/shadowing/geo' directory, specifically to check if the file 'geo_123456.ratdb' exists. The values contained within these respective .ratdb files are then inserted into the SOC file.
+The argument passed to the '-r' option is the run ID. LOCAS then searches for the corresponding SOC file '123456_Run.root' in the 'locas-plus/data/runs/soc' directory. If found, it will then search for the corresponding shadowing values based on the '-f' argument, stored in the LOCAS data directory (data/shadowing). For the shadowing values due to the AV Hold-Down ropes LOCAS will search the 'locas-plus/data/shadowing/avhd' directory for a file of the form 'avhd_123456.ratdb'. The shadowing values for the other enveloping geometry which surrounds the AV will be searched for in the 'locas-plus/data/shadowing/geo' directory, specifically to check if the file 'geo_123456.ratdb' exists. The values contained within these respective .ratdb files are then inserted into the SOC file.
 
 NOTE: ROOT doesn't actually allow for entries to be re-written on pre-existing ROOT trees. In essence, 'db2soc' actually first duplicates the SOC ROOT tree object located on the file, edits the required entries and overwrites the entire tree itself.
 
-In addition, at this current development stage, 'db2soc' can also insert values passed at the command line into the SOC file. This is useful for debugging of LOCAS. For instance at the command line:
+In addition, currently, 'db2soc' can also insert values passed at the command line into the SOC file. This is useful for debugging of LOCAS. For instance at the command line:
 
 	db2soc -r 123456 -s 500 -x 2000 -y 2000 -z 0
 
 Forces the SOC::SourceID entry on the SOC file "123456_Run.root" to be 500 and the laserball manipulator position to be (2000, 2000, 0) mm. In practice these entries should be written at the SOC processing level i.e. when the SOC file is written in the first place. But for now this feature is included as it is useful to test and debug various LOCAS processes which are subject to change. Obviously, if a SOC file contains simulated data corresponding to a run at the centre of the detector and the laserball manipulator position is forced using the '-x', '-y' and '-z' options - the data will lose any significance. 
 
-To find out which entries on the SOC file can be forced type 'db2soc --help' at the command line to view the current available options.
+To find out which entries on the SOC file can be forced type 'db2soc --help' at the command line to view all the current available options.
 
 soc2locas
 ==========
@@ -89,10 +110,24 @@ Example usage at the command line:
 
 Here, the '-r' argument is the main-run (SOC) file to be processed ("123456_Run.root"), '-c' is the associated central-run ("654321_Run.root") and '-w' an optional associated run at a different wavelength (in SNO, this was usually at 500 nm). The central- and wavelength- runs provide information which can be used to calculate the corrections to some of the optical parameters required for the main run file. 'soc2locas' writes a LOCASRun file, "123456_LOCASRun.root" to the 'locas-plus/data/runs/locasrun' directory.
 
+locas2fit
+==========
+The 'locas2fit' executable is responsible for processing the LOCASRun files and implementing them into a fit of the optical response of the detector. A list of run IDs whom respective LOCASRun files are to be used in the fit is passed at the command line lie so;
+
+    locas2fit /path/to/run_list.ratdb
+
+The format of the run_list.ratdb file should follow that as shown in the example run list file included in this installation of LOCAS ('locas-plus/data/runlists/test_runlist.ratdb'). 
+
+Note: This executable is currently in development, if you are reading this note then it is not complete!
+
 LOCAS Utilities
 ==========
 
-The 'util/' directory stores various scripts which could be useful for LOCAS. Currently there are scripts in 'util/shadowing-tool' which produce the shadowing values due to the AV hold-down ropes and the enveloping AV geometry. This tool requires the current system to be connected to a batch-node system which makes use of 'qsub' - the job submission executable. To use this tool, first ensure "env_locas.sh" has been sourced.
+The 'locas-plus/util/' directory stores various scripts which could be useful for LOCAS.
+
+Shadowing Utility
+==========
+Currently there are scripts in 'locas-plus/util/shadowing-tool' which produce the shadowing values due to the AV hold-down ropes and the enveloping AV geometry. This tool requires the current system to be connected to a batch-node system which makes use of 'qsub' - the job submission executable. To use this tool, first ensure "env_locas.sh" has been sourced.
 
 Example usage at the command line: 
 
@@ -107,13 +142,41 @@ The ShadowingEvGen.sh script will then perform 4 simulations of photon bombs at 
 
 Each run will consist of 30 x 1000 (=30,000) Events (5th argument x 6th argument) split up into 30 RAT runs of 1000 events each simulated on 30 batch node systems. The run specification passed at the command line will coincide with the same run whose ID is '123456' (7th argument) and whose associated SOC file is "123456_Run.root" stored in 'locas-plus/data/runs/soc'. Two files will be written with the relative shadowing values "avhd_123456.ratdb" and "geo_123456.ratdb" which will be written to 'locas-plus/data/shadowing/avhd' and 'locas-plus/data/shadowing/geo' respectively. These are the .ratdb files used by the 'db2soc' executable to insert values into the SOC file.
 
+LOCAS Plot
+==========
+
+In 'locas-plus/util/plot-tool' is 'LOCASPlot.cc'. This is a file containing a set of ROOT functions which are useful for visiually various parameters and values relevant to the optical model and calibration. To compile these functions, at the command line type:
+
+    root
+
+ROOT should then load and the messages 'RAT: Libraries Loaded' and 'LOCAS: Libraries Loaded' should appear if things are working correctly, you can then type:
+
+    root[0] .L LOCASPlot.cc+
+
+to compile the functions and use them in ROOT. See the comment above each function to learn about their function. There is also a master function which will call all the functions, plotting them all and saving them to a '.root' file.
+
+
 NOTES
 ==========
 
 1) Currently, by default LOCAS will search for SOC files in the 'locas-plus/data/runs/soc' directory. The SOC files should be named by run ID, i.e. for the laserball run with run id '123456', the associated SOC file should be named '123456_Run.root' and located in the 'locas-plus/data/runs/soc' directory. Once processed, LOCAS will output the LOCASRun files to 'locas-plus/data/runs/locasrun' and will write filenames of the form '123456_LOCASRun.root'.
 
-2) In the 'locas-plus/data/shadowing/avhd' and 'locas-plus/data/shadowing/geo' directories - there are 3 example shadowing value files; *_25121642.ratdb, *_18081902.ratdb and *_28071635.ratdb ( where * ='avhd' or 'geo' ) these are values obtained from the following three types fo example runs:
+2) In the 'locas-plus/data/shadowing/avhd' and 'locas-plus/data/shadowing/geo' directories - there are example shadowing value files:
 
-        25121642: 40,000 Photon Bomb Events (4000 photons per pulse) at 420nm at (4000, 0, 0) mm
-        28071635: 40,000 Photon Bomb Events (4000 photons per pulse) at 420nm at (0, 0, 0) mm
-        18081902: 40,000 Photon Bomb Events (4000 photons per pulse) at 500nm at (4000, 0, 0) mm
+        1010111: 20,000 Photon Bomb Events (5000 photons per pulse) at 400nm at (0, 0, 0) mm
+
+        21402140 : 20,000 Photon Bomb Events (5000 photons per pulse) at 400nm at (-4000, 0, 0) mm
+        11401140 : 20,000 Photon Bomb Events (5000 photons per pulse) at 400nm at (4000, 0, 0) mm
+	21202120 : 20,000 Photon Bomb Events (5000 photons per pulse) at 400nm at (-2000, 0, 0) mm
+	11201120 : 20,000 Photon Bomb Events (5000 photons per pulse) at 400nm at (2000, 0, 0) mm
+
+        22402240 : 20,000 Photon Bomb Events (5000 photons per pulse) at 400nm at (0, -4000, 0) mm
+        12401240 : 20,000 Photon Bomb Events (5000 photons per pulse) at 400nm at (0, 4000, 0) mm
+	22202220 : 20,000 Photon Bomb Events (5000 photons per pulse) at 400nm at (0, -2000, 0) mm
+	12201220 : 20,000 Photon Bomb Events (5000 photons per pulse) at 400nm at (0, 2000, 0) mm
+
+        23402340 : 20,000 Photon Bomb Events (5000 photons per pulse) at 400nm at (0, 0, -4000) mm
+        13401340 : 20,000 Photon Bomb Events (5000 photons per pulse) at 400nm at (0, 0, 4000) mm
+	23202320 : 20,000 Photon Bomb Events (5000 photons per pulse) at 400nm at (0, 0, -2000) mm
+	13201320 : 20,000 Photon Bomb Events (5000 photons per pulse) at 400nm at (0, 0, 2000) mm
+
