@@ -163,20 +163,20 @@ NOTES
 
 2) In the 'locas-plus/data/shadowing/avhd' and 'locas-plus/data/shadowing/geo' directories - there are example shadowing value files:
 
-        1010111: 20,000 Photon Bomb Events (5000 photons per pulse) at 400nm at (0, 0, 0) mm
+   1010111: 20,000 Photon Bomb Events (5000 photons per pulse) at 400nm at (0, 0, 0) mm
 
-        21402140 : 20,000 Photon Bomb Events (5000 photons per pulse) at 400nm at (-4000, 0, 0) mm
-        11401140 : 20,000 Photon Bomb Events (5000 photons per pulse) at 400nm at (4000, 0, 0) mm
-	21202120 : 20,000 Photon Bomb Events (5000 photons per pulse) at 400nm at (-2000, 0, 0) mm
-	11201120 : 20,000 Photon Bomb Events (5000 photons per pulse) at 400nm at (2000, 0, 0) mm
+   21402140 : 20,000 Photon Bomb Events (5000 photons per pulse) at 400nm at (-4000, 0, 0) mm
+   11401140 : 20,000 Photon Bomb Events (5000 photons per pulse) at 400nm at (4000, 0, 0) mm
+   21202120 : 20,000 Photon Bomb Events (5000 photons per pulse) at 400nm at (-2000, 0, 0) mm
+   11201120 : 20,000 Photon Bomb Events (5000 photons per pulse) at 400nm at (2000, 0, 0) mm
 
-        22402240 : 20,000 Photon Bomb Events (5000 photons per pulse) at 400nm at (0, -4000, 0) mm
-        12401240 : 20,000 Photon Bomb Events (5000 photons per pulse) at 400nm at (0, 4000, 0) mm
-	22202220 : 20,000 Photon Bomb Events (5000 photons per pulse) at 400nm at (0, -2000, 0) mm
-	12201220 : 20,000 Photon Bomb Events (5000 photons per pulse) at 400nm at (0, 2000, 0) mm
+   22402240 : 20,000 Photon Bomb Events (5000 photons per pulse) at 400nm at (0, -4000, 0) mm
+   12401240 : 20,000 Photon Bomb Events (5000 photons per pulse) at 400nm at (0, 4000, 0) mm
+   22202220 : 20,000 Photon Bomb Events (5000 photons per pulse) at 400nm at (0, -2000, 0) mm
+   12201220 : 20,000 Photon Bomb Events (5000 photons per pulse) at 400nm at (0, 2000, 0) mm
 
-        23402340 : 20,000 Photon Bomb Events (5000 photons per pulse) at 400nm at (0, 0, -4000) mm
-        13401340 : 20,000 Photon Bomb Events (5000 photons per pulse) at 400nm at (0, 0, 4000) mm
-	23202320 : 20,000 Photon Bomb Events (5000 photons per pulse) at 400nm at (0, 0, -2000) mm
-	13201320 : 20,000 Photon Bomb Events (5000 photons per pulse) at 400nm at (0, 0, 2000) mm
+   23402340 : 20,000 Photon Bomb Events (5000 photons per pulse) at 400nm at (0, 0, -4000) mm
+   13401340 : 20,000 Photon Bomb Events (5000 photons per pulse) at 400nm at (0, 0, 4000) mm
+   23202320 : 20,000 Photon Bomb Events (5000 photons per pulse) at 400nm at (0, 0, -2000) mm
+   13201320 : 20,000 Photon Bomb Events (5000 photons per pulse) at 400nm at (0, 0, 2000) mm
 
