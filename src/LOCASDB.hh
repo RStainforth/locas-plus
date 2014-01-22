@@ -18,7 +18,7 @@
 ///
 ///         In addition, this class can also load specific geometry
 ///         parameters (e.g. the AV Inner/Outer Radius) or
-///         refractive indices. These in particualr are used by 
+///         refractive indices. These in particular are used by 
 ///         the LOCASLightPath class.
 ///
 ////////////////////////////////////////////////////////////////////
@@ -54,28 +54,42 @@ namespace LOCAS{
     void Initialise();
     void Clear();
     
-    void LoadPMTPositions();
-    void LoadPMTNormals();
-    void LoadPMTTypes();
+    void LoadPMTInfo();                                      // Load and calculate the number of different types of PMT
+    void LoadPMTPositions();                                 // Load the PMT positions into memory
+    void LoadPMTNormals();                                   // Load the PMT normals into memory
+    void LoadPMTTypes();                                     // Load the PMT types into memory
     
-    void LoadRefractiveIndices();
+    void LoadRefractiveIndices();                            // Load the refractive indices into memory
+     
+    void LoadDetectorGeoParameters();                        // Load the detector geometry parameters into memory
+    void LoadPMTGeoParameters();                             // Load the pmt geometry parameters into memory
     
-    void LoadDetectorGeoParameters();
-    void LoadPMTGeoParameters();
-    
-    void LoadGeoPMTShadowingVals( Int_t runID );
-    void LoadAVHDRopePMTShadowingVals( Int_t runID );
+    void LoadGeoPMTShadowingVals( Int_t runID );             // Load the PMT geo-shadowing values into memory
+    void LoadAVHDRopePMTShadowingVals( Int_t runID );        // Load the PMT avhd-shadowing values into memory
 
-    void LoadRunList( const char* runList );
+    void LoadRunList( const char* runList );                 // Load a list of run IDs from a run list file into memory
     
     /////////////////////////////////
     ////////     GETTERS     ////////
     /////////////////////////////////
+
+    // NOTE: Before any of the below 'getters' are used, the corresponding data must be loaded
+    // into memory by using the appropriate method above. For example, before calling 'GetPMTPosition( pmtID )',
+    // you must first call 'LoadPMTPositions()'.
     
     TVector3 GetPMTPosition( Int_t pmtID ){ return fPMTPositions[ pmtID ]; }
     TVector3 GetPMTNormal( Int_t pmtID ){ return fPMTNormals[ pmtID ]; }
     Int_t GetPMTType( Int_t pmtID ){ return fPMTTypes[ pmtID ]; }
-    Int_t GetNPMTs(){ return fNPMTs; }
+
+    Int_t GetNTotalPMTs(){ return fNTotalPMTs; }
+    Int_t GetNNormalPMTs(){ return fNNormalPMTs; }
+    Int_t GetNOWLPMTs(){ return fNOWLPMTs; }
+    Int_t GetNLowGainPMTs(){ return fNLowGainPMTs; }
+    Int_t GetNBUTTPMTs(){ return fNBUTTPMTs; }
+    Int_t GetNNeckPMTs(){ return fNNeckPMTs; }
+    Int_t GetNCalibPMTs(){ return fNCalibPMTs; }
+    Int_t GetNSparePMTs(){ return fNSparePMTs; }
+    Int_t GetNInvalidPMTs(){ return fNInvalidPMTs; }
     
     TGraph GetScintRI(){ return fScintRI; }
     TGraph GetAVRI(){ return fAVRI; }
@@ -97,32 +111,59 @@ namespace LOCAS{
     
   private:
     
-    RAT::DB* fRATDB;
-    RAT::DBLinkPtr fRATDBPtr;
+    RAT::DB* fRATDB;                                         // Pointer to the RAT::DB Object
+    RAT::DBLinkPtr fRATDBPtr;                                // Pointer to the RAT Database
     
-    std::map<Int_t, TVector3> fPMTPositions;
-    std::map<Int_t, TVector3> fPMTNormals;
-    std::map<Int_t, Int_t> fPMTTypes;
+    std::map<Int_t, TVector3> fPMTPositions;                 // Map of PMT positions indexed by PMT ID
+    std::map<Int_t, TVector3> fPMTNormals;                   // Map of PMT normals (Unit Normalised) indexed by PMT ID (All normals point INWARDS)
+    std::map<Int_t, Int_t> fPMTTypes;                        // Map of PMT types indexed by PMT ID
     
-    TGraph fScintRI;
-    TGraph fAVRI;
-    TGraph fWaterRI;
-    
-    Double_t fAVInnerRadius;
-    Double_t fAVOuterRadius;
-    Double_t fAVNeckInnerRadius;
-    Double_t fAVNeckOuterRadius;
-    Double_t fPMTRadius;
+    // The following PMT types are defined in 'rat/data/pmt/airfill2.ratdb' found in RAT.
 
-    Int_t fNPMTs;
+    // 1: Normal
+    // 2: OWL
+    // 3: Low Gain
+    // 4: BUTT
+    // 5: Neck
+    // 6: Calib Channel
+    // 10: Spare
+    // 11: Invalid
+                                                             // Refractive indices stored in TGraphs, X: wavelength [nm], Y: refractive index
+    TGraph fScintRI;                                         // Scintillator (or "scint" region in .geo file) refractive indices
+    TGraph fAVRI;                                            // AV (Acrylic) refractive indices
+    TGraph fWaterRI;                                         // Water refractive indices
     
-    std::map<Int_t, Double_t> fGeoPMTShadowingVals;
-    std::map<Int_t, Double_t> fAVHDRopePMTShadowingVals;
-    
-    std::string fSOCRunDir;
-    std::string fLOCASRunDir;
+    Double_t fAVInnerRadius;                                 // The inner radius of the AV
+    Double_t fAVOuterRadius;                                 // The outer radius of the AV
+    Double_t fAVNeckInnerRadius;                             // The inner radius of the AV neck
+    Double_t fAVNeckOuterRadius;                             // The outer radius of the AV neck
+    Double_t fPMTRadius;                                     // The radius of the PMT face
 
-    std::vector< Int_t > fRunList;
+    Int_t fNTotalPMTs;                                       // The total number of PMTs loaded (inclusive of all types)
+    Int_t fNNormalPMTs;                                      // The number of 'conventional' PMTs in the detector
+    Int_t fNOWLPMTs;                                         // The number of outward looking PMTs
+    Int_t fNLowGainPMTs;                                     // The number of low gain PMTs
+    Int_t fNBUTTPMTs;                                        // The number of BUTT PMTs
+    Int_t fNNeckPMTs;                                        // The number of neck PMTs       
+    Int_t fNCalibPMTs;                                       // The number of calib channel PMTs
+    Int_t fNSparePMTs;                                       // The number of spare PMTs
+    Int_t fNInvalidPMTs;                                     // The number of invalid PMTs
+    
+    std::map<Int_t, Double_t> fGeoPMTShadowingVals;          // Map of relative occupancies indexed by PMT ID due to the shadowing from geometry
+                                                             // which surrounds the AV. This currently includes shadowing due to the following
+                                                             // found in the snoplus.geo detector geometry file:
+                                                             // NCDRing, NeckPipe, AVPPipe, AVPSupport, neckboss_out, neckboss_in, ncd_anchors,
+                                                             // belly_plates_in, belly_plates_out, belly_ropes,_av, belly_ropes, belly_groove_av
+
+    std::map<Int_t, Double_t> fAVHDRopePMTShadowingVals;     // Map of relative occupancies indexed by PMT ID due to the shadowing from
+                                                             // the AV Hold Down ropes. This currently includes shadowing due to the following
+                                                             // found in the snoplus.geo detector geometry file:
+                                                             // avHD
+    
+    std::string fSOCRunDir;                                  // The full system path of the directory where the SOC Run files are held
+    std::string fLOCASRunDir;                                // The full system path of the directory where the LOCASRun files are held
+
+    std::vector< Int_t > fRunList;                           // The list of RunIDs loaded from a runlist file
     
     ClassDef( LOCASDB, 1 );
         

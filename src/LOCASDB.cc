@@ -32,6 +32,8 @@ ClassImp( LOCASDB );
 LOCASDB::LOCASDB()
 {
 
+  // First need to ensure that all private variables are set to zero, or empty.
+
   fPMTPositions.clear();
   fPMTNormals.clear();
   fPMTTypes.clear();
@@ -46,7 +48,15 @@ LOCASDB::LOCASDB()
   fAVNeckOuterRadius = 0.0;
   fPMTRadius = 0.0;
 
-  fNPMTs = 0;
+  fNTotalPMTs = 0;
+  fNNormalPMTs = 0;
+  fNOWLPMTs = 0;
+  fNLowGainPMTs = 0;
+  fNBUTTPMTs = 0;
+  fNNeckPMTs = 0;
+  fNCalibPMTs = 0;
+  fNSparePMTs = 0;
+  fNInvalidPMTs = 0;
 
   fGeoPMTShadowingVals.clear();
   fAVHDRopePMTShadowingVals.clear();
@@ -70,10 +80,6 @@ void LOCASDB::Initialise()
   
   fRATDB = RAT::DB::Get();
   assert( fRATDB );
-
-  LoadPMTPositions();
-
-  fNPMTs = fPMTPositions.size();
 
   fSOCRunDir = getenv( "LOCAS_DATA" ) + (std::string)"/runs/soc/";
   fLOCASRunDir = getenv( "LOCAS_DATA" ) + (std::string)"/runs/locasrun/";
@@ -100,7 +106,16 @@ void LOCASDB::Clear()
   fAVNeckOuterRadius = 0.0;
   fPMTRadius = 0.0;
 
-  fNPMTs = 0;
+  fNTotalPMTs = 0;
+  fNNormalPMTs = 0;
+  fNOWLPMTs = 0;
+  fNLowGainPMTs = 0;
+  fNBUTTPMTs = 0;
+  fNNeckPMTs = 0;
+  fNCalibPMTs = 0;
+  fNSparePMTs = 0;
+  fNInvalidPMTs = 0;
+  
 
   fGeoPMTShadowingVals.clear();
   fAVHDRopePMTShadowingVals.clear();
@@ -109,6 +124,34 @@ void LOCASDB::Clear()
   fLOCASRunDir = "";
 
   fRATDB->Clear();
+
+}
+
+//////////////////////////////////////
+//////////////////////////////////////
+
+void LOCASDB::LoadPMTInfo()
+{
+
+  LoadPMTTypes();
+  fNTotalPMTs = fPMTTypes.size();
+  Int_t pmtType = 0;
+
+  for ( Int_t iPMT = 0; iPMT < fNTotalPMTs; iPMT++ ){
+    pmtType = fPMTTypes[ iPMT ];
+
+    if ( pmtType == 1 ){ fNNormalPMTs++; }
+    if ( pmtType == 2 ){ fNOWLPMTs++; }
+    if ( pmtType == 3 ){ fNLowGainPMTs++; }
+    if ( pmtType == 4 ){ fNBUTTPMTs++; }
+    if ( pmtType == 5 ){ fNNeckPMTs++; }
+    if ( pmtType == 6 ){ fNCalibPMTs++; }
+    if ( pmtType == 10 ){ fNSparePMTs++; }
+    if ( pmtType == 11 ){ fNInvalidPMTs++; }
+    
+  }
+
+  fPMTTypes.clear();
 
 }
 
@@ -232,7 +275,7 @@ void LOCASDB::LoadRefractiveIndices()
     fAVRI.SetPoint( point++, wavelengths[ pVal ], indices[ pVal ] );
   }
 
- //////// LOAD THE AV VOLUME REFRACTIVE INDICES ///////
+ //////// LOAD THE WATER VOLUME REFRACTIVE INDICES ///////
 
   fRATDBPtr = fRATDB->GetLink( "OPTICS", "lightwater_sno" );
   assert( fRATDBPtr );
