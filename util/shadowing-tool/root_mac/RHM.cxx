@@ -4,7 +4,7 @@
 void RHM_${JobID}_${ConfigNameCore}(){
   
   LOCAS::LOCASDB lDB;
-  Int_t nPMTs = lDB.GetNPMTs();
+  Int_t nPMTs = lDB.GetNTotalPMTs();
   
   ofstream roccVals;
   roccVals.precision( 6 );
@@ -25,6 +25,9 @@ void RHM_${JobID}_${ConfigNameCore}(){
   
   roccVals << "{\nname : \"" << ratdbName << "\",\n";
   roccVals << "valid_begin : [0, 0],\nvalid_end : [0, 0],\n";
+  roccVals << "source_pos : [" << ${XPos} << "," << ${YPos} << "," << ${ZPos} << "],\n";
+  roccVals << "wavelength : [" << ${WLength} << "],\n";
+  roccVals << "num_mc_events : [" << ${NumEvents} << "]\n";
   roccVals << "shadowing_value : [";
   
   for ( int d = 0; d < nPMTs; d++ ){
