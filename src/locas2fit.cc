@@ -198,9 +198,10 @@ Float_t CalcModelROcc( Double_t* params )
 {
 
   Float_t diffScint = currentPMT->GetCorrDistInScint();
+  Float_t normTerm = currentPMT->GetCorrLBIntensityNorm();
   
   Float_t expTerm = TMath::Exp( - ( diffScint / params[0] ) );
   // cout << "[Model]ROcc: " << expTerm << " | Scint Diff: " << diffScint << " | Scintillator Attn.: " << params[0] << endl;
-  return expTerm;
+  return normTerm * expTerm;
   
 }
