@@ -100,7 +100,7 @@ def ProduceROOTWHMBash( config_name, job_ID, ratroot, locasroot, locasdatatmp ):
 
     return
 
-def ProduceROOTRHMMacro( config_name, job_ID ):
+def ProduceROOTRHMMacro( config_name, job_ID, x_pos, y_pos, z_pos, wl, n_events ):
 
     in_file = open( "RHM.cxx", "r" )
     raw_text = string.Template( in_file.read() )
@@ -109,7 +109,12 @@ def ProduceROOTRHMMacro( config_name, job_ID ):
     out_text = raw_text.substitute( ConfigNameCore = config_name,
                                     ConfigNameW = "w" + config_name,
                                     ConfigNameWO = "wo" + config_name,
-                                    JobID = job_ID )
+                                    JobID = job_ID,
+                                    XPos = x_pos,
+                                    YPos = y_pos,
+                                    ZPos = z_pos,
+                                    WLength = wl,
+                                    NumEvents = n_events )
 
     macro_for_cycle = open( "RHM_" + str(job_ID) + "_" + config_name + ".cxx", "w" )
     macro_for_cycle.write( out_text )
@@ -165,10 +170,10 @@ if __name__ == '__main__':
     ProduceROOTWHMMacro( "woGEO", str(nJobs), jobID )
     ProduceROOTWHMBash( "woGEO", jobID, rat_root, locas_root, locas_data_tmp )
 
-    ProduceROOTRHMMacro( "AVHD", jobID )
+    ProduceROOTRHMMacro( "AVHD", jobID, x_pos, y_pos, z_pos, WvL, nJobs * nEvents )
     ProduceROOTRHMBash( "AVHD", jobID, rat_root, locas_root, locas_data_tmp )
 
-    ProduceROOTRHMMacro( "GEO", jobID )
+    ProduceROOTRHMMacro( "GEO", jobID, x_pos, y_pos, z_pos, WvL, nJobs * nEvents )
     ProduceROOTRHMBash( "GEO", jobID, rat_root, locas_root, locas_data_tmp )
 
     

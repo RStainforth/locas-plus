@@ -81,6 +81,9 @@ void LOCASDB::Initialise()
   fRATDB = RAT::DB::Get();
   assert( fRATDB );
 
+  LoadPMTPositions();
+  fNTotalPMTs = fPMTPositions.size();
+
   fSOCRunDir = getenv( "LOCAS_DATA" ) + (std::string)"/runs/soc/";
   fLOCASRunDir = getenv( "LOCAS_DATA" ) + (std::string)"/runs/locasrun/";
 

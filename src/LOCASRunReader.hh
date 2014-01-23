@@ -11,7 +11,10 @@
 /// REVISION HISTORY:\n
 ///     0X/2014 : RPFS - First Revision, new file. \n
 ///
-/// DETAIL: *NEEDS WRITING*
+/// DETAIL: This class is used for easily reading in the LOCASRun
+///         files. This is similar to the SOCReader class used
+///         in RAT for RAT::DS::SOC objects but for LOCAS::LOCASRun
+///         objects
 ///
 ////////////////////////////////////////////////////////////////////
 
@@ -73,15 +76,16 @@ namespace LOCAS{
 
   protected:
 
-    TChain* fLOCASRunT;
-    LOCASRun* fLOCASRun;
+    TChain* fLOCASRunT;                   // TChain of the ROOT files added to the LOCASRun reader
+    LOCASRun* fLOCASRun;                  // Pointer to the current LOCASRun TTree
     
-    Long64_t fNext;
-    Long64_t fNLOCASRuns;
+    Long64_t fNext;                       // Index of the next LOCASRun TTree in the TChain
+    Long64_t fNLOCASRuns;                 // Total number of LOCASRun TTrees in the TChain
 
-    std::vector< Int_t > fListOfRunIDs;
+    std::vector< Int_t > fListOfRunIDs;   // Vector of RunIDs whose corresponding ROOT fies
+                                          // have been loaded onto the TChain
 
-    LOCASPMT* fCurrentPMT;
+    LOCASPMT* fCurrentPMT;                // Pointer to the current LOCASPMT object
 
     ClassDef( LOCASRunReader, 0 ) 
     

@@ -49,9 +49,9 @@ namespace LOCAS{
     
     void Initialise();
     void Clear( Option_t* option="");
-    void AddSOCPMTData( RAT::DS::SOCPMT& socPMT );
-    void ProcessLightPath( LOCASLightPath& lPath );
-    void VerifyPMT();
+    void AddSOCPMTData( RAT::DS::SOCPMT& socPMT );                    // Add information from a SOCPMT object to this LOCASPMT object
+    void ProcessLightPath( LOCASLightPath& lPath );                   // Process a light path to calculate the distances, solidangle etc.
+    void VerifyPMT();                                                 // Verify that the fields of the PMT are complete and have 'reasonable' values
     
     /////////////////////////////////
     ////////     SETTERS     ////////
@@ -60,10 +60,11 @@ namespace LOCAS{
     void SetID( Int_t pmtID ){ fID = pmtID; }
     void SetType( Int_t pmtType ){ fType = pmtType; }
 
+
     void SetIsVerified( Bool_t verified ){ fIsVerified = verified; }
-    
-    void SetPos( TVector3 xyzPos ){ fPos = xyzPos; }
-    void SetNorm( TVector3 uvwOri ){ fNorm = uvwOri; }
+                                                                          
+    void SetPos( TVector3 xyzPos ){ fPos = xyzPos; }                  
+    void SetNorm( TVector3 uvwOri ){ fNorm = uvwOri; }                
     
     void SetPromptPeakTime( Float_t tPeak ){ fPromptPeakTime = tPeak; }
     void SetPromptPeakWidth( Float_t tWidth ){ fPromptPeakWidth = tWidth; }  
@@ -183,10 +184,21 @@ namespace LOCAS{
   private:
     
     Int_t fID;                          // PMT ID/LCN
-    Int_t fType;                        // The PMT type as defined in airfill2.ratdb (RAT)
+    Int_t fType;                        // The PMT type
+
+    // The following PMT types are defined in 'rat/data/pmt/airfill2.ratdb' found in RAT.
+
+    // 1: Normal
+    // 2: OWL
+    // 3: Low Gain
+    // 4: BUTT
+    // 5: Neck
+    // 6: Calib Channel
+    // 10: Spare
+    // 11: Invalid
 
     Bool_t fIsVerified;                 // TRUE: PMT has sensible values FALSE: Some bad values
-                                        // See LOCASPMT::VerifyPMT for details
+                                        // See LOCASPMT::VerifyPMT for details (LOCASPMT.cc)
     
     TVector3 fPos;                      // PMT Position
     TVector3 fNorm;                     // PMT Orientation
@@ -242,8 +254,6 @@ namespace LOCAS{
     Float_t fCorrDistInScint;           // (Main Run - Central Run) Distances through scintillator
     Float_t fCorrDistInAV;              // (Main Run - Central Run) Distances through acrylic
     Float_t fCorrDistInWater;           // (Main Run - Central Run) Distances through water
-
-
     
     ClassDef( LOCASPMT, 1 );
     

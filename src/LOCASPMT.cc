@@ -368,7 +368,6 @@ void LOCASPMT::VerifyPMT()
   if ( fNorm.Mag() < 0.9 || fNorm.Mag() > 1.1 ){ fIsVerified = false; }
   
   if ( fPromptPeakTime == 0.0 || fPromptPeakTime > 410.0 ){ fIsVerified = false; }
-  //if ( fPromptPeakWidth == 0.0 ){ fIsVerified = false; }
   if ( fTimeOfFlight == 0.0 || fTimeOfFlight > 410.0 ){ fIsVerified = false; }
   if ( fOccupancy == 0.0 ){ fIsVerified = false; }
   if ( fOccupancyErr == 0.0 ){ fIsVerified = false; }
@@ -399,11 +398,10 @@ void LOCASPMT::VerifyPMT()
   // CSSFlag doesn't need to be checked here
   // BadPath doesn't need to be checked here
   // NeckFlag doesn't need to be checked here
-
   
   // all Corr* values don't need to be checked here
   // As all Corr* values are dependent on pre-verified values
-  // done in respect runs
+  // done in respective runs
 
 }
 
