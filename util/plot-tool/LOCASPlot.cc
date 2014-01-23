@@ -944,7 +944,7 @@ GeoShadowing( const Int_t runID, const char* plot_file_name,
   lDB.LoadPMTPositions();
   lDB.LoadGeoPMTShadowingVals( runID );
 
-  for ( Int_t iPMT = 0; iPMT < lDB.GetNPMTs(); iPMT++ ){
+  for ( Int_t iPMT = 0; iPMT < lDB.GetNTotalPMTs(); iPMT++ ){
 
     Int_t pmtType = lDB.GetPMTType( iPMT );
     Double_t pmtShadowVal = lDB.GetGeoPMTShadowingVal( iPMT );
