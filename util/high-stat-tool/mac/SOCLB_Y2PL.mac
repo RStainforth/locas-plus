@@ -1,0 +1,66 @@
+
+
+# Don't care about hadrons or muons so quicker not to initialise these processes
+/PhysicsList/OmitMuonicProcesses true
+/PhysicsList/OmitHadronicProcesses true
+
+/rat/db/set DETECTOR geo_file "geo/snoplus.geo"
+# the following line is just for recording in soc file.
+#/rat/db/set LASERBALL wavelength 500
+# position of laserball in mm
+#/rat/db/set LASERBALL lsbpx 0.0d0
+#/rat/db/set LASERBALL lsbpy 0.0d0
+#/rat/db/set LASERBALL lsbpz 0.0d0
+#/rat/db/set LASERBALL lsborient 0.0d0
+#/rat/db/set NOISE noise_flag 0
+/run/initialize
+
+# BEGIN EVENT LOOP
+/rat/proc frontend
+/rat/proc trigger
+/rat/proc eventbuilder
+/rat/proc calibratePMT
+
+/rat/proc count
+/rat/procset update 1
+
+/rat/proc fitter
+/rat/procset method "centroid"
+
+/rat/proc socdata
+/rat/proc socpeakfind
+
+#/rat/proc socfitter
+#/rat/procset method "positionTimeChiSquared"
+#/rat/procset optimiser "powell"
+
+/rat/proc outsoc
+/rat/procset file "${ROOTFileName}"
+
+# END EVENT LOOP
+
+
+# Choose the laserball generator from fixed point, uniform in time
+#/generator/add combo lsbp:point:uniform
+
+# Choose 1000 photons, with a distribution found in a file dist.dat with energies in MeV units
+#/generator/vtx/set 1000 file:dist.dat
+
+# Choose 1000 photons, with a distribution found in a file distnm.dat with wavelengths in nm
+#/generator/vtx/set 1000 file:distnm.dat(nm)
+
+# Choose 1000 photons, with a distribution peaked at 420nm (bis-MSB) per pulse
+#/generator/vtx/set 1000 BIS-MSB
+
+# Alternativelty the laserball generator can generate photons at a single energy value
+# Choose 5000 photons, each of 500nm per pulse
+/generator/add combo pbomb:point:uniform
+/generator/vtx/set 5000 500
+
+# Originating in the centre
+/generator/pos/set 0 2000 0 mm
+/generator/rate/set 100
+
+/rat/run/start ${EventsPerCycle}
+
+exit
