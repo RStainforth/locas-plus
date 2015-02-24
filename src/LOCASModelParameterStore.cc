@@ -22,6 +22,7 @@
 #include "LOCASDB.hh"
 
 #include "TFile.h"
+#include "TTree.h"
 
 #include <string>
 #include <sstream>

@@ -33,6 +33,7 @@
 #include "TStyle.h"
 #include "TAxis.h"
 
+#include <getopt.h>
 #include <iostream>
 #include <map>
 

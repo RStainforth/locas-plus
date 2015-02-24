@@ -19,16 +19,17 @@
 #include "LOCASFit.hh"
 
 #include <iostream>
+#include <getopt.h>
 
 using namespace std;
 using namespace LOCAS;
 
-int main( int argc, char** argv );
+int main( char** argv );
 
 //////////////////////
 //////////////////////
 
-int main( int argc, char** argv ){
+int main( char** argv ){
 
   cout << "\n";
   cout << "#######################################" << endl;

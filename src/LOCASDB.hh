@@ -34,7 +34,7 @@
 #include <sstream>
 #include <vector>
 
-#include "RAT/SOCReader.hh"
+#include "RAT/DU/SOCReader.hh"
 #include "RAT/DS/SOC.hh"
 #include "RAT/DS/SOCPMT.hh"
 #include "RAT/DB.hh"

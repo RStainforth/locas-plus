@@ -36,7 +36,7 @@
 #include <TClonesArray.h>
 
 #include "RAT/DS/SOC.hh"
-#include "RAT/SOCReader.hh"
+#include "RAT/DU/SOCReader.hh"
 
 #include "LOCASPMT.hh"
 
@@ -60,10 +60,10 @@ namespace LOCAS{
 
     // Fill information from a SOC file with run ID 'runID'
     // into the run information here
-    void Fill( RAT::SOCReader& socR, Int_t runID );
+    void Fill( RAT::DU::SOCReader& socR, Int_t runID );
     
-    void CopySOCRunInfo( RAT::DS::SOC* socRun );
-    void CopySOCPMTInfo( RAT::DS::SOC* socRun );
+    void CopySOCRunInfo( RAT::DS::SOC& socRun );
+    void CopySOCPMTInfo( RAT::DS::SOC& socRun );
     
     void CopyLOCASRunInfo( LOCASRun& locasRun );
     void CopyLOCASPMTInfo( LOCASRun& locasPMT );
@@ -77,7 +77,7 @@ namespace LOCAS{
     // Fill information about a central run (cRun) and a
     // wavelength run (wRun) (if specified) into this LOCASRun
     // object
-    void CrossRunFill( LOCASRun* cRun, LOCASRun* wRun );
+    void CrossRunFill( LOCASRun& cRun, LOCASRun& wRun );
 
     // Calculate the number of prompt counts detected at each PMT
     // within the run. This must be called after CopySOCPMTInfo()
@@ -91,9 +91,9 @@ namespace LOCAS{
     void SetCentralRunID( const Int_t runID ){ fCentralRunID = runID; }
     void SetWavelengthRunID( const Int_t runID ){ fWavelengthRunID = runID; }
 
-    void SetSourceID( const Int_t sourceID ){ fSourceID = sourceID; }
-    void SetCentralSourceID( const Int_t sourceID ){ fCentralSourceID = sourceID; }
-    void SetWavelengthSourceID( const Int_t sourceID ){ fWavelengthSourceID = sourceID; }
+    void SetSourceID( const std::string sourceID ){ fSourceID = sourceID; }
+    void SetCentralSourceID( const std::string sourceID ){ fCentralSourceID = sourceID; }
+    void SetWavelengthSourceID( const std::string sourceID ){ fWavelengthSourceID = sourceID; }
 
     void SetIsMainRun( const Bool_t isMain ){ fIsMainRun = isMain; }
     void SetIsCentralRun( const Bool_t isCentral ){ fIsCentralRun = isCentral; }
@@ -175,9 +175,9 @@ namespace LOCAS{
     Int_t GetCentralRunID() const { return fCentralRunID; }
     Int_t GetWavelengthRunID() const { return fWavelengthRunID; }
 
-    Int_t GetSourceID() const { return fSourceID; }
-    Int_t GetCentralSourceID() const { return fCentralSourceID; }
-    Int_t GetWavelengthSourceID() const { return fWavelengthSourceID; }
+    std::string GetSourceID() const { return fSourceID; }
+    std::string GetCentralSourceID() const { return fCentralSourceID; }
+    std::string GetWavelengthSourceID() const { return fWavelengthSourceID; }
 
     Bool_t GetIsMainRun() const { return fIsMainRun; }
     Bool_t GetIsCentralRun() const { return fIsCentralRun; }
@@ -236,9 +236,9 @@ namespace LOCAS{
     Int_t fCentralRunID;                   // The Central Run ID
     Int_t fWavelengthRunID;                // The Wavelength Run ID
 
-    Int_t fSourceID;                       // The Source ID
-    Int_t fCentralSourceID;                // The Central Run Source ID
-    Int_t fWavelengthSourceID;             // The Wavelength Run Source ID
+    std::string fSourceID;                 // The Source ID
+    std::string fCentralSourceID;          // The Central Run Source ID
+    std::string fWavelengthSourceID;       // The Wavelength Run Source ID
     
     Bool_t fIsMainRun;                     // TRUE: Main Run False: Other
     Bool_t fIsCentralRun;                  // TRUE: Central Run FALSE: Other Run

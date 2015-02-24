@@ -28,7 +28,9 @@
 
 #include "RAT/DS/SOCPMT.hh"
 #include "RAT/DS/SOC.hh"
-#include "RAT/SOCReader.hh"
+#include "RAT/DU/SOCReader.hh"
+#include "RAT/DS/FitResult.hh"
+#include "RAT/DS/FitVertex.hh"
 
 using namespace LOCAS;
 using namespace std;
@@ -195,9 +197,9 @@ void LOCASRun::Initialise()
   SetCentralRunID( -1 );
   SetWavelengthRunID( -1 );
 
-  SetSourceID( -1 );
-  SetCentralSourceID( -1 );
-  SetWavelengthSourceID( -1 );
+  SetSourceID( "-1" );
+  SetCentralSourceID( "-1" );
+  SetWavelengthSourceID( "-1" );
 
   SetIsMainRun( false );
   SetIsCentralRun( false );
@@ -259,18 +261,18 @@ void LOCASRun::Clear( Option_t* option )
 //////////////////////////////////////
 //////////////////////////////////////
 
-void LOCASRun::Fill( RAT::SOCReader& socR, Int_t runID )
+void LOCASRun::Fill( RAT::DU::SOCReader& socR, Int_t runID )
 {
 
-  RAT::DS::SOC* socPtr = NULL;
+  RAT::DS::SOC socObj;
 
   // First check that a SOC file with the specified runID exists in the SOCReader
-  for ( Int_t iSOC = 0; iSOC < socR.GetNSOC(); iSOC++ ){
-    socPtr = socR.GetSOC( iSOC );
-    if ( socPtr->GetRunID() == runID ){ break; }
+  for ( Int_t iSOC = 0; iSOC < socR.GetSOCCount(); iSOC++ ){
+    socObj = socR.GetSOC( iSOC );
+    if ( socObj.GetRunID() == runID ){ break; }
     else{ continue; }
     
-    if ( iSOC == ( socR.GetNSOC() - 1 ) ){
+    if ( iSOC == ( socR.GetSOCCount() - 1 ) ){
       cout << "LOCASRun::Fill: Error: No SOC file with specified run-ID found" << endl;
     }
   }
@@ -280,9 +282,9 @@ void LOCASRun::Fill( RAT::SOCReader& socR, Int_t runID )
   // neccessary information.
   
   // The run information from the SOC file...
-  CopySOCRunInfo( socPtr );
+  CopySOCRunInfo( socObj );
   // ... and the PMT information from the SOC file.
-  CopySOCPMTInfo( socPtr );
+  CopySOCPMTInfo( socObj );
 
   // Create the LOCAS Data base Object (LOCASDB) and
   // load PMT information and detector parameters;
@@ -351,31 +353,43 @@ void LOCASRun::Fill( RAT::SOCReader& socR, Int_t runID )
 //////////////////////////////////////
 //////////////////////////////////////
 
-void LOCASRun::CopySOCRunInfo( RAT::DS::SOC* socRun )
+void LOCASRun::CopySOCRunInfo( RAT::DS::SOC& socRun )
 {
 
   // Copies all the Run-level information from a SOC file
   // and puts it into (this) LOCASRun object
 
-  SetRunID( socRun->GetRunID() );
-  SetSourceID( socRun->GetSourceID() );
-  SetLambda( socRun->GetLaserWavelength() );
-  SetLBPos( socRun->GetSourcePosManip() ); 
+  SetRunID( socRun.GetRunID() );
+  SetSourceID( socRun.GetSourceID() );
+  
+  // FIXME: The 'GetMode()' call only returns an Int_t value
+  // for the laserball wavelength. Is this enough precision?
+  SetLambda( socRun.GetCalib().GetMode() );
+
+  // The fitted result from the laserball fit on the SOC file
+  RAT::DS::FitVertex lbSOCFitVertex = socRun.GetFitResult( "lbfit" ).GetVertex( 0 );
+
+  // FIXME: This returns the fitted LB position.
+  // So we can also from here set the errors on the position also.
+  SetLBPos( lbSOCFitVertex.GetPosition() );
+  SetLBXPosErr( lbSOCFitVertex.GetPositivePositionError().X() );
+  SetLBYPosErr( lbSOCFitVertex.GetPositivePositionError().Y() );
+  SetLBZPosErr( lbSOCFitVertex.GetPositivePositionError().Z() );
 
 }
 
 //////////////////////////////////////
 //////////////////////////////////////
 
-void LOCASRun::CopySOCPMTInfo( RAT::DS::SOC* socRun )
+void LOCASRun::CopySOCPMTInfo( RAT::DS::SOC& socRun )
 {
 
   // Copies all the SOCPMTs information from from a SOC
   // file and copies them into LOCASPMT objects
 
-  std::map<Int_t, RAT::DS::SOCPMT>::iterator iSOCPMT;
-  for ( iSOCPMT = socRun->GetSOCPMTIterBegin(); iSOCPMT != socRun->GetSOCPMTIterEnd(); ++iSOCPMT ){
-    AddSOCPMT( iSOCPMT->second );
+  std::vector< UInt_t > pmtIDs = socRun.GetSOCPMTIDs();
+  for ( Size_t iSOCPMT = 0; iSOCPMT < pmtIDs.size(); iSOCPMT++ ){
+    AddSOCPMT( socRun.GetSOCPMT( pmtIDs[ iSOCPMT ] ) );
   }
 
 }
@@ -476,55 +490,55 @@ LOCASPMT& LOCASRun::GetPMT( Int_t iPMT )
 //////////////////////////////////////
 //////////////////////////////////////
 
-void LOCASRun::CrossRunFill( LOCASRun* cRun, LOCASRun* wRun )
+void LOCASRun::CrossRunFill( LOCASRun& cRun, LOCASRun& wRun )
 {
 
-  if ( cRun == NULL && wRun == NULL ){
+  if ( &cRun == NULL && &wRun == NULL ){
     cout << "LOCASRun::CrossRunFill: Error: No Central or Wavelength Run Information to fill from" << endl;
     cout << "--------------------------" << endl;
     return;
   }
 
-  if ( cRun != NULL ){
+  if ( &cRun != NULL ){
     
-    fCentralRunID = cRun->GetRunID();
-    fCentralSourceID = cRun->GetSourceID();
+    fCentralRunID = cRun.GetRunID();
+    fCentralSourceID = cRun.GetSourceID();
     
-    fCentralLambda = cRun->GetLambda();
-    fCentralNLBPulses = cRun->GetNLBPulses();
+    fCentralLambda = cRun.GetLambda();
+    fCentralNLBPulses = cRun.GetNLBPulses();
     
-    fCentralLBIntensityNorm = cRun->GetLBIntensityNorm();
-    fCentralLBPos = cRun->GetLBPos();
+    fCentralLBIntensityNorm = cRun.GetLBIntensityNorm();
+    fCentralLBPos = cRun.GetLBPos();
     
-    fCentralLBTheta = cRun->GetLBTheta();
-    fCentralLBPhi = cRun->GetLBPhi();
+    fCentralLBTheta = cRun.GetLBTheta();
+    fCentralLBPhi = cRun.GetLBPhi();
         
   }
   
-  if ( wRun != NULL ){
+  if ( &wRun != NULL ){
     
-    fWavelengthRunID = wRun->GetRunID();
-    fWavelengthSourceID = wRun->GetSourceID();
+    fWavelengthRunID = wRun.GetRunID();
+    fWavelengthSourceID = wRun.GetSourceID();
     
-    fWavelengthLambda = wRun->GetLambda();
-    fWavelengthNLBPulses = wRun->GetNLBPulses();
+    fWavelengthLambda = wRun.GetLambda();
+    fWavelengthNLBPulses = wRun.GetNLBPulses();
     
-    fWavelengthLBIntensityNorm = wRun->GetLBIntensityNorm();
-    fWavelengthLBPos = wRun->GetLBPos();
+    fWavelengthLBIntensityNorm = wRun.GetLBIntensityNorm();
+    fWavelengthLBPos = wRun.GetLBPos();
     
-    fWavelengthLBTheta = wRun->GetLBTheta();
-    fWavelengthLBPhi = wRun->GetLBPhi();
+    fWavelengthLBTheta = wRun.GetLBTheta();
+    fWavelengthLBPhi = wRun.GetLBPhi();
     
   }
 
-  if ( cRun ){
+  if ( &cRun ){
 
     cout << "LOCASRun::CrossRunFill: Filling Central Run Information..." << endl;
     cout << "--------------------------" << endl;
     std::map< Int_t, LOCASPMT >::iterator iCPMT;
-    for( iCPMT = cRun->GetLOCASPMTIterBegin(); iCPMT != cRun->GetLOCASPMTIterEnd(); iCPMT++ ){
+    for( iCPMT = cRun.GetLOCASPMTIterBegin(); iCPMT != cRun.GetLOCASPMTIterEnd(); iCPMT++ ){
       Int_t pmtID = ( iCPMT->first );
-      ( fLOCASPMTs[ pmtID ] ).SetCentralRunID( cRun->GetRunID() );
+      ( fLOCASPMTs[ pmtID ] ).SetCentralRunID( cRun.GetRunID() );
       ( fLOCASPMTs[ pmtID ] ).SetCentralIsVerified( ( iCPMT->second ).GetIsVerified() );
       
       ( fLOCASPMTs[ pmtID ] ).SetCentralPromptPeakTime( ( iCPMT->second ).GetPromptPeakTime() );
@@ -567,14 +581,14 @@ void LOCASRun::CrossRunFill( LOCASRun* cRun, LOCASRun* wRun )
     }
   }
   
-  if ( wRun ){
+  if ( &wRun ){
 
     cout << "LOCASRun::CrossRunFill: Filling Wavelength Run Information..." << endl;
     cout << "--------------------------" << endl;
     std::map< Int_t, LOCASPMT >::iterator iWPMT;
-    for( iWPMT = wRun->GetLOCASPMTIterBegin(); iWPMT != wRun->GetLOCASPMTIterEnd(); iWPMT++ ){
+    for( iWPMT = wRun.GetLOCASPMTIterBegin(); iWPMT != wRun.GetLOCASPMTIterEnd(); iWPMT++ ){
       Int_t pmtID = ( iWPMT->first );
-      ( fLOCASPMTs[ pmtID ] ).SetWavelengthRunID( wRun->GetRunID() );
+      ( fLOCASPMTs[ pmtID ] ).SetWavelengthRunID( wRun.GetRunID() );
       ( fLOCASPMTs[ pmtID ] ).SetWavelengthIsVerified( ( iWPMT->second ).GetIsVerified() );
       
       ( fLOCASPMTs[ pmtID ] ).SetWavelengthPromptPeakTime( ( iWPMT->second ).GetPromptPeakTime() );

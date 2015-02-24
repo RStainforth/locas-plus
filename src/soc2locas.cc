@@ -40,8 +40,8 @@
 ///
 ///////////////////////////////////////////////////////////////////////////////////////
 
-#include "RAT/getopt.h"
-#include "RAT/SOCReader.hh"
+#include <getopt.h>
+#include "RAT/DU/SOCReader.hh"
 #include "RAT/DS/SOC.hh"
 #include "RAT/DS/SOCPMT.hh"
 
@@ -51,9 +51,11 @@
 #include "LOCASLightPath.hh"
 
 #include "TFile.h"
+#include "TTree.h"
 
 #include <iostream>
 #include <fstream>
+#include <getopt.h>
 #include <string>
 #include <map>
 
@@ -191,13 +193,13 @@ int main( int argc, char** argv ){
 
   // Create the LOCASRun Objects for the run (lRun),
   // central (lCRun) and wavelength (lWRun) runs respectively.
-  LOCASRun* lRunPtr = new LOCASRun();
+  LOCASRun lRunPtr;
   // Set Default run-IDs and Run-Types
-  lRunPtr->SetRunID( rID );
-  lRunPtr->SetNLBPulses( 1000000.0 );
+  lRunPtr.SetRunID( rID );
+  lRunPtr.SetNLBPulses( 1000000.0 );
 
-  LOCASRun* lCRunPtr = NULL;
-  LOCASRun* lWRunPtr = NULL;
+  LOCASRun lCRunPtr;
+  LOCASRun lWRunPtr;
   
   // Create the SOCReader object <-- This allows for multiple SOC files
   // to be loaded
@@ -205,14 +207,13 @@ int main( int argc, char** argv ){
   cout << rIDStr + (string)"_Run.root" << endl;
   cout << "--------------------------" << endl;
   // Add the main-run to the SOC reader first
-  RAT::SOCReader soc( ( socRunDir + rIDStr + (string)"_Run.root" ).c_str() );
+  RAT::DU::SOCReader soc( ( socRunDir + rIDStr + (string)"_Run.root" ).c_str() );
 
   // If a central-run has been specified, add it to the SOCReader
   if ( crBool ){
 
-    lCRunPtr = new LOCASRun();
-    lCRunPtr->SetRunID( crID );
-    lCRunPtr->SetNLBPulses( 1000000.0 );
+    lCRunPtr.SetRunID( crID );
+    lCRunPtr.SetNLBPulses( 1000000.0 );
 
     cout << "Adding central-run SOC file: " << endl;
     cout << crIDStr + (string)"_Run.root" << endl;
@@ -225,9 +226,8 @@ int main( int argc, char** argv ){
   // If a wavelength-run has been specified, add it to the SOCReader
   if ( wrBool ){
 
-    lWRunPtr = new LOCASRun();
-    lWRunPtr->SetRunID( crID );
-    lWRunPtr->SetNLBPulses( 1000000.0 );
+    lWRunPtr.SetRunID( crID );
+    lWRunPtr.SetNLBPulses( 1000000.0 );
 
     cout << "Adding wavelength-run SOC file: " << endl;
     cout << wrIDStr + (string)"_Run.root" << endl;
@@ -239,9 +239,9 @@ int main( int argc, char** argv ){
   // Now fill the LOCASRuns objects with the respective information
   // from the SOC files in the SOC reader
   cout << "Now filling run information from SOC file..." << endl;
-  lRunPtr->Fill( soc, rID );
-  if ( crBool ){ lCRunPtr->Fill( soc, crID ); cout << "Now filling central run information from SOC file..." << endl;}
-  if ( wrBool ){ lWRunPtr->Fill( soc, wrID ); cout << "Now filling wavelength run information from SOC file..." << endl;}
+  lRunPtr.Fill( soc, rID );
+  if ( crBool ){ lCRunPtr.Fill( soc, crID ); cout << "Now filling central run information from SOC file..." << endl;}
+  if ( wrBool ){ lWRunPtr.Fill( soc, wrID ); cout << "Now filling wavelength run information from SOC file..." << endl;}
 
 
   // Now that all the SOC files have been loaded, and the LOCASRun objects
@@ -252,7 +252,7 @@ int main( int argc, char** argv ){
   //cout << "Now Performing CrossRunFill" << endl;
   // // CALCULATION OF CROSS-RUN INFORMATION GOES HERE //
   // // START //
-  lRunPtr->CrossRunFill( lCRunPtr, lWRunPtr );
+  lRunPtr.CrossRunFill( lCRunPtr, lWRunPtr );
   // // END //
 
 
@@ -267,7 +267,7 @@ int main( int argc, char** argv ){
   TTree* runTree = new TTree( "LOCASRunT", "LOCAS Run Tree" );
 
   // Declare a new branch pointing to the data stored in the lRun object
-  runTree->Branch( "LOCASRun", lRunPtr->ClassName(), &(*lRunPtr), 32000, 99 );
+  runTree->Branch( "LOCASRun", lRunPtr.ClassName(), &lRunPtr, 32000, 99 );
   file->cd();
 
   // Fill the tree and write it to the file
@@ -297,7 +297,7 @@ int main( int argc, char** argv ){
 
 LOCASCmdOptions ParseArguments( int argc, char** argv) 
 {
-  static struct RAT::option opts[] = { {"help", 0, NULL, 'h'},
+  static struct option opts[] = { {"help", 0, NULL, 'h'},
                                        {"run-id", 1, NULL, 'r'},
                                        {"central-run-id", 1, NULL, 'c'},
                                        {"wavelength-run-id", 1, NULL, 'w'},
@@ -309,9 +309,9 @@ LOCASCmdOptions ParseArguments( int argc, char** argv)
   while (c != -1) {
     switch (c) {
     case 'h': cout << "HELP GOES HERE" << endl; break;
-    case 'r': options.fRID = atol( RAT::optarg ); break;
-    case 'c': options.fCRID = atol( RAT::optarg ); break;
-    case 'w': options.fWRID = atol( RAT::optarg ); break;
+    case 'r': options.fRID = atol( optarg ); break;
+    case 'c': options.fCRID = atol( optarg ); break;
+    case 'w': options.fWRID = atol( optarg ); break;
     }
     
     c = getopt_long(argc, argv, "h:r:c:w:", opts, &option_index);

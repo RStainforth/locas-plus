@@ -485,19 +485,18 @@ void LOCASPMT::AddSOCPMTData( RAT::DS::SOCPMT& socPMT )
 
   SetID( socPMT.GetLCN() );
 
-  Double_t pmtTACCal = 0.0;
-  Double_t pmtTACRMS = 0.0;
-  socPMT.CalculateTAC( pmtTACCal, pmtTACRMS );
+  Double_t pmtTACCal = socPMT.GetTimeCentroid();
+  Double_t pmtTACRMS = socPMT.GetTimeCentroidError();
 
   SetPromptPeakTime( pmtTACCal );
   SetPromptPeakWidth( pmtTACRMS );
-  SetTimeOfFlight( socPMT.GetTOF() );
-  SetOccupancy( socPMT.GetPromptOcc() );
+  SetTimeOfFlight( socPMT.GetTOFManipulator() );
+  SetOccupancy( socPMT.GetPromptOccupancy() );
   SetOccupancyErr( TMath::Sqrt( fOccupancy ) );
-  SetOccupancyCorr( ( fOccupancy ) / ( ( socPMT.GetTACs() ).size() ) );
+  SetOccupancyCorr( ( fOccupancy ) / ( ( socPMT.GetTimes() ).size() ) );
 
-  SetGeometricShadowVal( socPMT.GetRelOccSim_fullShadow() );
-  SetAVHDShadowVal( socPMT.GetRelOccSim_hdRopeShadow() );
+  SetGeometricShadowVal( socPMT.GetShadowRelativeOccupancy() );
+  SetAVHDShadowVal( socPMT.GetRopeShadowRelativeOccupancy() );
 
 
 }
