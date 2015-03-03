@@ -249,11 +249,10 @@ void LOCASFit::LoadFitFile( const char* fitFile )
   fMrqX = LOCASVector( 1, fNDataPointsInFit );
   fMrqY = LOCASVector( 1, fNDataPointsInFit );
   fMrqSigma = LOCASVector( 1, fNDataPointsInFit );
-  
 
+  cout << "Got this Far 1" << endl;
   // Set which of the variables in the fit are to be varied
   // and what the starting, initial values of these parameters are.
-
   // The (1/attenuation) lengths
   fScintVary = lDB.GetBoolField( "FITFILE", "scint_vary" );
   fScintInit = lDB.GetDoubleField( "FITFILE", "scint_init" );
@@ -262,6 +261,7 @@ void LOCASFit::LoadFitFile( const char* fitFile )
   fWaterVary = lDB.GetBoolField( "FITFILE", "water_vary" );
   fWaterInit = lDB.GetDoubleField( "FITFILE", "water_init" );
 
+  cout << "Got this Far 2" << endl;
   // The (1/rayleigh-scattering) lengths
   fScintRSVary = lDB.GetBoolField( "FITFILE", "scint_rs_vary" );
   fScintRSInit = lDB.GetDoubleField( "FITFILE", "scint_rs_init" );
@@ -270,28 +270,34 @@ void LOCASFit::LoadFitFile( const char* fitFile )
   fWaterRSVary = lDB.GetBoolField( "FITFILE", "water_rs_vary" );
   fWaterRSInit = lDB.GetDoubleField( "FITFILE", "water_rs_init" );
 
+  cout << "Got this Far 3" << endl;
   // The angular response and laserball distributions
   fAngularResponseVary = lDB.GetBoolField( "FITFILE", "ang_resp_vary" );
   fAngularResponse2Vary = lDB.GetBoolField( "FITFILE", "ang_resp2_vary" );
   fAngularResponseInit = lDB.GetDoubleField( "FITFILE", "ang_resp_init" );
 
+  cout << "Got this Far 4" << endl;
   fLBDistributionVary = lDB.GetBoolField( "FITFILE", "lb_dist_vary" );
   fLBDistributionInit = lDB.GetDoubleField( "FITFILE", "lb_dist_init" );
 
+  cout << "Got this Far 5" << endl;
   // The run (1/normalisation) values
   fLBNormalisationVary = lDB.GetBoolField( "FITFILE", "run_norm_vary" );
   fLBNormalisationInit = lDB.GetDoubleField( "FITFILE", "run_norm_init" );
 
+  cout << "Got this Far 6" << endl;
   // Get the number of theta and phi bins for the laserball distribution 2D historgram
   // and the minimum number of entires required for each bin
   fNLBDistributionThetaBins = lDB.GetIntField( "FITFILE", "lb_dist_n_theta_bins" );
   fNLBDistributionPhiBins = lDB.GetIntField( "FITFILE", "lb_dist_n_phi_bins" );
   fNLBDistributionMaskParameters = lDB.GetIntField( "FITFILE", "lb_dist_n_mask_pars" );
   fNLBDistributionThetaWaveBins = lDB.GetIntField( "FITFILE", "lb_dist_n_theta_wave_bins" );
+  cout << "Got this Far 7" << endl;
   fNLBDistributionWave = 2;
   fNPMTsPerLBDistributionBinMin = lDB.GetIntField( "FITFILE", "lb_dist_min_n_pmts" );
   fLBDistributionType = lDB.GetIntField( "FITFILE", "lb_dist_type" );
 
+  cout << "Got this Far 8" << endl;
   // Get the number of theta bins for the PMT angular response histogram
   // and the minimum number of entries for each bin
   fNAngularResponseBins = lDB.GetIntField( "FITFILE", "ang_resp_n_bins" );
@@ -302,36 +308,42 @@ void LOCASFit::LoadFitFile( const char* fitFile )
   // Where applicable the PMTs are checked against these cuts for both the off-axis AND
   // central runs e.g. the AV Shadowing Values
 
+  cout << "Got this Far 9" << endl;
   // Maximum initial Chi-Square
   fChiSquareMaxLimit = lDB.GetDoubleField( "FITFILE", "cut_chisq_max" );
 
   // Minimumm initial Chi-Square
   fChiSquareMinLimit = lDB.GetDoubleField( "FITFILE", "cut_chisq_min" );
 
+  cout << "Got this Far 10" << endl;
   // Number of sigma away from mean occupancy for entire run
   fNSigma = lDB.GetDoubleField( "FITFILE", "cut_n_sigma" );
 
   // Number of occupancy to cut on
   fNOccupancy = lDB.GetIntField( "FITFILE", "cut_n_occupancy" );
 
+  cout << "Got this Far 11" << endl;
   // Minimum AVHD shadowing value
   fAVHDShadowingMin = lDB.GetDoubleField( "FITFILE", "cut_avhd_sh_min" );
 
   // Maximum AVHD shadowing value
   fAVHDShadowingMax = lDB.GetDoubleField( "FITFILE", "cut_avhd_sh_max" );
 
+  cout << "Got this Far 12" << endl;
   // Minimum Geometric shadowing value
   fGeoShadowingMin = lDB.GetDoubleField( "FITFILE", "cut_geo_sh_min" );
 
   // Maximum Geometric shadowing value
   fGeoShadowingMax = lDB.GetDoubleField( "FITFILE", "cut_geo_sh_max" );
 
+  cout << "Got this Far 13" << endl;
   // Whether to cut on CHS flag
   fCHSFlag = lDB.GetBoolField( "FITFILE", "cut_chs_flag" );
 
   // Whether to cut on CSS flag
   fCSSFlag = lDB.GetBoolField( "FITFILE", "cut_css_flag" );
 
+  cout << "Got this Far 14" << endl;
   // The limits on the PMT costheta values
   fCosThetaMaxLimit = lDB.GetDoubleField( "FITFILE", "cut_costheta_max" );
   fCosThetaMinLimit = lDB.GetDoubleField( "FITFILE", "cut_costheta_min" );
@@ -340,13 +352,14 @@ void LOCASFit::LoadFitFile( const char* fitFile )
   fPMTDataROccMaxLimit = lDB.GetDoubleField( "FITFILE", "cut_pmtrocc_max" );
   fPMTDataROccMinLimit = lDB.GetDoubleField( "FITFILE", "cut_pmtrocc_min" );
 
+  cout << "Got this Far 15" << endl;
   // The limits on the PMT positions (theta and phi limits)
   fPMTPosThetaMaxLimit = lDB.GetDoubleField( "FITFILE", "cut_pmttheta_max" );
   fPMTPosThetaMinLimit = lDB.GetDoubleField( "FITFILE", "cut_pmttheta_min" );
   fPMTPosPhiMaxLimit = lDB.GetDoubleField( "FITFILE", "cut_pmtphi_max" );
   fPMTPosPhiMinLimit = lDB.GetDoubleField( "FITFILE", "cut_pmtphi_min" );
 
-
+  cout << "Got this Far 16" << endl;
   // Number of PMTs to skip over in the final PMT data set when fitting
   // this is purely to speed things up.
   fNPMTSkip = lDB.GetIntField( "FITFILE", "n_pmts_skip" );
@@ -460,7 +473,7 @@ void LOCASFit::InitialiseParameters()
     if ( nPMTsTmp != 0 && normCentralVal != 0.0 && normVal != 0.0 && normCentralVal != 0.0 ){ normVal /= nPMTsTmp; normCentralVal /= nCentralPMTsTmp; }
     fCentralRunNorms[ iT ] = normCentralVal;
     fMrqParameters[ GetLBNormalisationParIndex() + iT ] = normVal;
-    printf( "Run %i of 27 has norm: %.10f with %i PMTs\n", iT + 1, normVal, nPMTsTmp );
+    printf( "Run %i of %i has norm: %.10f with %i PMTs\n", iT + 1, fNRuns, normVal, nPMTsTmp );
     
   }
 
@@ -1733,10 +1746,9 @@ Float_t LOCASFit::CalculatePMTData( const LOCASPMT* iPMTPtr )
   Int_t runIndex = GetRunIndex( iPMTPtr->GetRunID() );
   Float_t pmtData = ( ( iPMTPtr->GetCentralSolidAngle() * iPMTPtr->GetCentralFresnelTCoeff() )
                       / ( iPMTPtr->GetSolidAngle() * iPMTPtr->GetFresnelTCoeff() ) );
-  //cout << "geoFactor is: " << pmtData << endl;
+
   pmtData *= ( ( ( iPMTPtr->GetMPECorrOccupancy() ) / ( ( iPMTPtr->GetCentralMPECorrOccupancy() ) ) ) * fCentralRunNorms[ runIndex ] );
-  //cout << "finalFactor is: " << pmtData << endl;
-  //cout << "-----------" << endl;
+
   return pmtData;
 
 }

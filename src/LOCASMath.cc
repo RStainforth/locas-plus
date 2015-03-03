@@ -38,7 +38,7 @@ ClassImp( LOCASMath );
 //////////////////////////////////////
 //////////////////////////////////////
 
-Double_t LOCASMath::MPECorrectedNPrompt( const Double_t nPrompt, const Double_t nPulses )
+Float_t LOCASMath::MPECorrectedNPrompt( const Float_t nPrompt, const Float_t nPulses )
 {
 
   // This is the equation as featured in eqn 4.13, page 77 of B.Moffat's PhD thesis
@@ -50,7 +50,7 @@ Double_t LOCASMath::MPECorrectedNPrompt( const Double_t nPrompt, const Double_t 
 //////////////////////////////////////
 //////////////////////////////////////
 
-Double_t LOCASMath::MPECorrectedNPromptErr( const Double_t nPrompt, const Double_t nPulses )
+Float_t LOCASMath::MPECorrectedNPromptErr( const Float_t nPrompt, const Float_t nPulses )
 {
 
   // This is the equation as featured in eqn 4.14, page 77 of B.Moffat's PhD thesis
@@ -62,7 +62,7 @@ Double_t LOCASMath::MPECorrectedNPromptErr( const Double_t nPrompt, const Double
 //////////////////////////////////////
 //////////////////////////////////////
 
-Double_t LOCASMath::MPECorrectedNPromptCorr( const Double_t mpeOcc, const Double_t nPrompt, const Double_t nPulses )
+Float_t LOCASMath::MPECorrectedNPromptCorr( const Float_t mpeOcc, const Float_t nPrompt, const Float_t nPulses )
 {
 
   // This is the equation as featured in eqn 4.14, page 77 of B.Moffat's PhD thesis
@@ -74,7 +74,7 @@ Double_t LOCASMath::MPECorrectedNPromptCorr( const Double_t mpeOcc, const Double
 //////////////////////////////////////
 //////////////////////////////////////
 
-Double_t LOCASMath::OccRatioErr( const LOCASPMT* pmt ){
+Float_t LOCASMath::OccRatioErr( const LOCASPMT* pmt ){
 
   Double_t errResult = 1.0;
   Double_t run2 = pow( ( ( pmt->GetMPECorrOccupancyErr() ) / ( pmt->GetMPECorrOccupancy() ) ), 2 );
